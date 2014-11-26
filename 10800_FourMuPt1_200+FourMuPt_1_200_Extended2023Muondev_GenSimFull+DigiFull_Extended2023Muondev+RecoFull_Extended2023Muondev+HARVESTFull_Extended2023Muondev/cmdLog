@@ -1,0 +1,16 @@
+
+# in: /afs/cern.ch/user/n/natalie/OfflineStubs/CMSSW_6_2_0_SLHC20/src going to execute cd 10800_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev
+ cmsDriver.py FourMuPt_1_200_cfi  --conditions auto:upgradePLS3 -n 10 --eventcontent FEVTDEBUG --relval 10000,100 -s GEN,SIM --datatier GEN-SIM --beamspot Gauss --customise SLHCUpgradeSimulations/Configuration/combinedCustoms.cust_2023Muondev --geometry Extended2023Muondev,Extended2023MuondevReco --magField 38T_PostLS1 --fileout file:step1.root  > step1_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev.log  2>&1
+ 
+
+# in: /afs/cern.ch/user/n/natalie/OfflineStubs/CMSSW_6_2_0_SLHC20/src going to execute cd 10800_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev
+ cmsDriver.py step2  --conditions auto:upgradePLS3 -n 10 --eventcontent FEVTDEBUGHLT -s DIGI:pdigi_valid,L1,DIGI2RAW --datatier GEN-SIM-DIGI-RAW --customise SLHCUpgradeSimulations/Configuration/combinedCustoms.cust_2023Muondev --geometry Extended2023Muondev,Extended2023MuondevReco --magField 38T_PostLS1 --filein file:step1.root  --fileout file:step2.root  > step2_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev.log  2>&1
+ 
+
+# in: /afs/cern.ch/user/n/natalie/OfflineStubs/CMSSW_6_2_0_SLHC20/src going to execute cd 10800_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev
+ cmsDriver.py step3  --conditions auto:upgradePLS3 -n 10 --eventcontent FEVTDEBUGHLT,DQM -s RAW2DIGI,L1Reco,RECO,VALIDATION,DQM --datatier GEN-SIM-RECO,DQMIO --customise SLHCUpgradeSimulations/Configuration/combinedCustoms.cust_2023Muondev --geometry Extended2023Muondev,Extended2023MuondevReco --magField 38T_PostLS1 --filein file:step2.root  --fileout file:step3.root  > step3_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev.log  2>&1
+ 
+
+# in: /afs/cern.ch/user/n/natalie/OfflineStubs/CMSSW_6_2_0_SLHC20/src going to execute cd 10800_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev
+ cmsDriver.py step4  --conditions auto:upgradePLS3 --scenario pp -s HARVESTING:validationHarvesting+dqmHarvesting --filetype DQM --customise SLHCUpgradeSimulations/Configuration/combinedCustoms.cust_2023Muondev --geometry Extended2023Muondev,Extended2023MuondevReco --mc  --magField 38T_PostLS1 -n 100  --filein file:step3_inDQM.root --fileout file:step4.root  > step4_FourMuPt1_200+FourMuPt_1_200_Extended2023Muondev_GenSimFull+DigiFull_Extended2023Muondev+RecoFull_Extended2023Muondev+HARVESTFull_Extended2023Muondev.log  2>&1
+ 
