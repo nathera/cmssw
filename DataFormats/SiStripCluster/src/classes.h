@@ -18,7 +18,7 @@ namespace {
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/SiStripCluster/interface/SiStripCluster.h"
 #include "DataFormats/Common/interface/ContainerMask.h"
-#include "DataFormats/SiStripCluster/interface/SiStripStub.h"
+
 
 
 namespace {
@@ -45,22 +45,6 @@ namespace {
     
     edm::Ref<   edm::DetSetVector<SiStripCluster>, SiStripCluster, edm::refhelper::FindForDetSetVector<   SiStripCluster> >    refOld;
     edm::Ref<edmNew::DetSetVector<SiStripCluster>, SiStripCluster, edmNew::DetSetVector<SiStripCluster>::FindForDetSetVector > refNew;
-
-    //Dictionaries for SiStripStub and collections
-    SiStripStub                                               SSTUB;
-    std::vector< SiStripStub >                              V_SSTUB;
-    edm::Wrapper< std::vector< SiStripStub > >            W_V_SSTUB;
-    edmNew::DetSetVector< SiStripStub >                   SDV_SSTUB;
-    edm::Wrapper< edmNew::DetSetVector< SiStripStub > > W_SDV_SSTUB;
-
-
-    edm::Ref< edmNew::DetSetVector< SiStripStub >, SiStripStub >                                    R_SSTUB;
-    edm::Wrapper< edm::Ref< edmNew::DetSetVector< SiStripStub >, SiStripStub > >                  W_R_SSTUB;
-    std::vector< edm::Ref< edmNew::DetSetVector< SiStripStub >, SiStripStub > >                   V_R_SSTUB;
-    edm::Wrapper< std::vector< edm::Ref< edmNew::DetSetVector< SiStripStub >, SiStripStub > > > W_V_R_SSTUB;
-
-
-
 
   };
 }

@@ -50,17 +50,5 @@
  <class name="std::vector<edm::Ref<edm::LazyGetter<SiStripCluster>,SiStripCluster,edm::FindValue<SiStripCluster> > >" />
  <class name="edmNew::DetSetVector<edm::Ref<edm::LazyGetter<SiStripCluster>,SiStripCluster,edm::FindValue<SiStripCluster> > >" />
  <class name="edm::Wrapper<edmNew::DetSetVector<edm::Ref<edm::LazyGetter<SiStripCluster>,SiStripCluster,edm::FindValue<SiStripCluster> > > >" />
-
- <class pattern="SiStripStub" />
- <class pattern="std::vector<SiStripStub>" />
- <class pattern="edm::Wrapper<std::vector<SiStripStub>>" />
- <class pattern="edmNew::DetSetVector<SiStripStub>" />
- <class pattern="edm::Wrapper<edmNew::DetSetVector<SiStripStub>>" />
  
- <class pattern="edm::Ref<edmNew::DetSetVector<SiStripStub>,SiStripStub,edmNew::DetSetVector<SiStripStub>::FindForDetSetVector>" />
- <class pattern="edm::Wrapper<edm::Ref<edmNew::DetSetVector<SiStripStub>,SiStripStub,edmNew::DetSetVector<SiStripStub>::FindForDetSetVector>>" />
- <class pattern="std::vector<edm::Ref<edmNew::DetSetVector<SiStripStub>,SiStripStub,edmNew::DetSetVector<SiStripStub>::FindForDetSetVector>>" />
- <class pattern="edm::Wrapper<std::vector<edm::Ref<edmNew::DetSetVector<SiStripStub>,SiStripStub,edmNew::DetSetVector<SiStripStub>::FindForDetSetVector>>>" />
-
-
 </lcgdict>
