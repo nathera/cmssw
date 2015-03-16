@@ -159,7 +159,6 @@ namespace {
      l1extra::L1TkTauParticleCollection trktauColl ;
      edm::Wrapper<l1extra::L1TkTauParticleCollection> w_trktauColl;
      l1extra::L1TkTauParticleRef reftrkTau ;
-
   
   };
 

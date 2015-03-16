@@ -22,15 +22,16 @@ process = cms.Process("TRA")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 
-process.source = cms.Source("PoolSource",
-     fileNames = cms.untracked.vstring(
-     '/store/group/comm_trigger/L1TrackTrigger/620_SLHC10/Extended2023TTI/Electrons/PU140/m1_SingleElectron_E2023TTI_PU140.root'
-     )
-)
+#process.source = cms.Source("PoolSource",
+#     fileNames = cms.untracked.vstring(
+#'/store/group/comm_trigger/L1TrackTrigger/620_SLHC10/Extended2023TTI/Electrons/PU140/m1_SingleElectron_E2023TTI_PU140.root'
+#     )
+#)
 
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring( 'file:step2.root' ) ) 
 
 # ---- Global Tag :
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -55,8 +56,8 @@ process.BeamSpotFromSim =cms.EDProducer("BeamSpotFromSimProducer")
 # --- In case one wants to reproduce everything (of course, the tracker
 #     digis must have been kept oh the file), one just needs :
 # 
-# process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
-# process.pL1Tracks = cms.Path( process.L1TrackTrigger )
+process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
+process.pL1Tracks = cms.Path( process.L1TrackTrigger )
 # 
 
 
