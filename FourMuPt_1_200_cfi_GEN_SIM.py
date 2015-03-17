@@ -3,6 +3,7 @@
 # Revision: 1.20 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
 # with command line options: FourMuPt_1_200_cfi --conditions auto:upgradePLS3 -n 10 --eventcontent FEVTDEBUG --relval 10000,100 -s GEN,SIM --datatier GEN-SIM --beamspot Gauss --customise SLHCUpgradeSimulations/Configuration/combinedCustoms.cust_2023Muondev --geometry Extended2023Muondev,Extended2023MuondevReco --magField 38T_PostLS1 --fileout file:step1.root
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('SIM')
