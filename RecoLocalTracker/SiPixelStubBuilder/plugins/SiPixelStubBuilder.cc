@@ -39,11 +39,11 @@ namespace cms
   //---------------------------------------------------------------------------
   SiPixelStubBuilder::SiPixelStubBuilder(edm::ParameterSet const& conf) 
     : 
-    _conf(conf)
+    _conf(conf),
 //    clusterMode_("None"),     // bogus
 //    _stubBuilder(0),          // the default, in case we fail to make one
 //    readyToCluster_(false),   // since we obviously aren't
-//    src_( conf.getParameter<edm::InputTag>( "src" ) ),
+    src_( conf.getParameter<edm::InputTag>( "src" ) )
 //    maxTotalClusters_( conf.getParameter<int32_t>( "maxNumberOfClusters" ) )
   {
     //--- Declare to the EDM what kind of collections we will be making.
@@ -76,13 +76,13 @@ namespace cms
   void SiPixelStubBuilder::produce(edm::Event& e, const edm::EventSetup& es)
   {
     std::cout << "SiPixelStubBuilder::produce( )";
-/*
+
 
    // Step A.1: get input data
     //edm::Handle<PixelDigiCollection> pixDigis;
     edm::Handle< edm::DetSetVector<SiPixelCluster> >  input;
     e.getByLabel( src_, input);
-
+/*
     // Step A.2: get event setup
     edm::ESHandle<TrackerGeometry> geom;
     es.get<TrackerDigiGeometryRecord>().get( geom );
