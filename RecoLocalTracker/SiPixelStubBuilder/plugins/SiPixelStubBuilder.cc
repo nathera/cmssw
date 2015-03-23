@@ -39,35 +39,35 @@ namespace cms
   //---------------------------------------------------------------------------
   SiPixelStubBuilder::SiPixelStubBuilder(edm::ParameterSet const& conf) 
     : 
-    _conf(conf),
-    clusterMode_("None"),     // bogus
-    _stubBuilder(0),          // the default, in case we fail to make one
-    readyToCluster_(false),   // since we obviously aren't
-    src_( conf.getParameter<edm::InputTag>( "src" ) ),
-    maxTotalClusters_( conf.getParameter<int32_t>( "maxNumberOfClusters" ) )
+    _conf(conf)
+//    clusterMode_("None"),     // bogus
+//    _stubBuilder(0),          // the default, in case we fail to make one
+//    readyToCluster_(false),   // since we obviously aren't
+//    src_( conf.getParameter<edm::InputTag>( "src" ) ),
+//    maxTotalClusters_( conf.getParameter<int32_t>( "maxNumberOfClusters" ) )
   {
     //--- Declare to the EDM what kind of collections we will be making.
     produces<SiPixelStubCollectionNew>(); 
 
-    std::string payloadType = conf.getParameter<std::string>( "payloadType" );
+//    std::string payloadType = conf.getParameter<std::string>( "payloadType" );
 
 
 
     //--- Make the algorithm(s) according to what the user specified
     //--- in the ParameterSet.
-    setupStubBuilder();
+//    setupStubBuilder();
 
   }
 
   // Destructor
   SiPixelStubBuilder::~SiPixelStubBuilder() { 
-    delete _stubBuilder;
+//    delete _stubBuilder;
   }  
 
   //void SiPixelStubBuilder::beginJob( const edm::EventSetup& es ) 
   void SiPixelStubBuilder::beginJob( ) 
   {
-    edm::LogInfo("SiPixelClusterizer") << "[SiPixelClusterizer::beginJob]";
+    std::cout << "SiPixelStubBuilder::beginJob( )";
   }
   
   //---------------------------------------------------------------------------
@@ -75,7 +75,8 @@ namespace cms
   //---------------------------------------------------------------------------
   void SiPixelStubBuilder::produce(edm::Event& e, const edm::EventSetup& es)
   {
-
+    std::cout << "SiPixelStubBuilder::produce( )";
+/*
 
    // Step A.1: get input data
     //edm::Handle<PixelDigiCollection> pixDigis;
@@ -136,7 +137,7 @@ namespace cms
 
 //     int numberOfDetUnits = 0;
 //     int numberOfClusters = 0;
- 
+*/ 
     // Iterate on detector units
 /*    edm::DetSetVector<PixelDigi>::const_iterator DSViter = input.begin();
     for( ; DSViter != input.end(); DSViter++) {

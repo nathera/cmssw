@@ -44,7 +44,7 @@ namespace cms
     explicit SiPixelStubBuilder(const edm::ParameterSet& conf);
     virtual ~SiPixelStubBuilder();
 
-    void setupStubBuilder();
+//    void setupStubBuilder();
 
     // Begin Job
     //virtual void beginJob( const edm::EventSetup& );
@@ -54,13 +54,14 @@ namespace cms
     virtual void produce(edm::Event& e, const edm::EventSetup& c);
 
     //--- Execute the algorithm(s).
-    void run(const edm::DetSetVector<SiPixelCluster>   & input,
-	     edm::ESHandle<TrackerGeometry>       & geom,
-             edmNew::DetSetVector<SiPixelStub> & output);
+//    void run(const edm::DetSetVector<SiPixelCluster>   & input,
+//	     edm::ESHandle<TrackerGeometry>       & geom,
+//             edmNew::DetSetVector<SiPixelStub> & output);
 
   private:
 
     edm::ParameterSet _conf;
+/*
     std::string clusterMode_;               // user's choice of the clusterizer
     SiPixelStubBuilderBase * _stubBuilder;    // what we got (for now, one ptr to base class)
     bool readyToCluster_;                   // needed clusterizers valid => good to go!
@@ -68,6 +69,7 @@ namespace cms
 
     //! Optional limit on the total number of clusters
     int32_t maxTotalClusters_;
+*/
   };
 }
 
