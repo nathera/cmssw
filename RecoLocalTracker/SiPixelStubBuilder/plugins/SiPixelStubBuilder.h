@@ -1,8 +1,8 @@
-#ifndef RecoLocalTracker_SiPixelStubBuilder_SiPixelStubProducer_h
-#define RecoLocalTracker_SiPixelStubBuilder_SiPixelStubProducer_h
+#ifndef RecoLocalTracker_SiPixelStubBuilder_SiPixelStubBuilder_h
+#define RecoLocalTracker_SiPixelStubBuilder_SiPixelStubBuilder_h
 
 //---------------------------------------------------------------------------
-//! \class SiPixelStubProducer
+//! \class SiPixelStubBuilder
 //!
 //! \brief EDProducer to create SiPixelStubs from SiPixelClusters.
 //!//!
@@ -38,11 +38,11 @@
 namespace cms
 {
 
-  class SiPixelStubProducer : public edm::EDProducer {
+  class SiPixelStubBuilder : public edm::EDProducer {
   public:
     //--- Constructor, virtual destructor (just in case)
-    explicit SiPixelStubProducer(const edm::ParameterSet& conf);
-    virtual ~SiPixelStubProducer();
+    explicit SiPixelStubBuilder(const edm::ParameterSet& conf);
+    virtual ~SiPixelStubBuilder();
 
     void setupStubBuilder();
 
@@ -59,6 +59,7 @@ namespace cms
              edmNew::DetSetVector<SiPixelStub> & output);
 
   private:
+
     edm::ParameterSet _conf;
     std::string clusterMode_;               // user's choice of the clusterizer
     SiPixelStubBuilderBase * _stubBuilder;    // what we got (for now, one ptr to base class)

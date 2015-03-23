@@ -1,11 +1,11 @@
-/** SiPixelStubProducer.cc
+/** SiPixelStubBuilder.cc
  * ---------------------------------------------------------------
- * Natalie Heracleous modified from SiPixelClusterProducer 
+ * Natalie Heracleous modified from SiPixelClusterBuilder 
  * ---------------------------------------------------------------
  */
 
 // Our own stuff
-#include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelStubProducer.h"
+#include "RecoLocalTracker/SiPixelStubBuilder/plugins/SiPixelStubBuilder.h"
 #include "RecoLocalTracker/SiPixelStubBuilder/interface/DummyStubBuilder.h"
 
 // Geometry
@@ -37,7 +37,7 @@ namespace cms
   //---------------------------------------------------------------------------
   //!  Constructor: set the ParameterSet and defer all thinking to setupStubBuilder().
   //---------------------------------------------------------------------------
-  SiPixelStubProducer::SiPixelStubProducer(edm::ParameterSet const& conf) 
+  SiPixelStubBuilder::SiPixelStubBuilder(edm::ParameterSet const& conf) 
     : 
     _conf(conf),
     clusterMode_("None"),     // bogus
@@ -60,12 +60,12 @@ namespace cms
   }
 
   // Destructor
-  SiPixelStubProducer::~SiPixelStubProducer() { 
+  SiPixelStubBuilder::~SiPixelStubBuilder() { 
     delete _stubBuilder;
   }  
 
-  //void SiPixelStubProducer::beginJob( const edm::EventSetup& es ) 
-  void SiPixelStubProducer::beginJob( ) 
+  //void SiPixelStubBuilder::beginJob( const edm::EventSetup& es ) 
+  void SiPixelStubBuilder::beginJob( ) 
   {
     edm::LogInfo("SiPixelClusterizer") << "[SiPixelClusterizer::beginJob]";
   }
@@ -73,7 +73,7 @@ namespace cms
   //---------------------------------------------------------------------------
   //! The "Event" entrypoint: gets called by framework for every event
   //---------------------------------------------------------------------------
-  void SiPixelStubProducer::produce(edm::Event& e, const edm::EventSetup& es)
+  void SiPixelStubBuilder::produce(edm::Event& e, const edm::EventSetup& es)
   {
 
 
@@ -104,7 +104,7 @@ namespace cms
   //!  TO DO: in the future, we should allow for a different algorithm for 
   //!  each detector subset (e.g. barrel vs forward, per layer, etc).
   //---------------------------------------------------------------------------
-  void SiPixelStubProducer::setupStubBuilder()  {
+  void SiPixelStubBuilder::setupStubBuilder()  {
     clusterMode_ = 
     _conf.getUntrackedParameter<std::string>("ClusterMode","DummyStubBuilder");
 
@@ -113,7 +113,7 @@ namespace cms
       readyToCluster_ = true;
     } 
     else {
-      edm::LogError("SiPixelStubProducer") << "[SiPixelStubProducer]:"
+      edm::LogError("SiPixelStubBuilder") << "[SiPixelStubBuilder]:"
 		<<" choice " << clusterMode_ << " is invalid.\n"
 		<< "Possible choices:\n" 
         << "    DummyStubBuilder";
@@ -124,11 +124,11 @@ namespace cms
   //---------------------------------------------------------------------------
   //!  Iterate over DetUnits, and invoke the PixelClusterizer on each.
   //---------------------------------------------------------------------------
-  void SiPixelStubProducer::run(const edm::DetSetVector<SiPixelCluster>   & input, 
+  void SiPixelStubBuilder::run(const edm::DetSetVector<SiPixelCluster>   & input, 
 				   edm::ESHandle<TrackerGeometry>       & geom,
                                    edmNew::DetSetVector<SiPixelStub> & output) {
     if ( ! readyToCluster_ ) {
-      edm::LogError("SiPixelStubProducer")
+      edm::LogError("SiPixelStubBuilder")
 		<<" at least one clusterizer is not ready -- can't run!" ;
       // TO DO: throw an exception here?  The user may want to know...
       return;   // clusterizer is invalid, bail out
@@ -143,7 +143,7 @@ namespace cms
       ++numberOfDetUnits;
 
       //  LogDebug takes very long time, get rid off.
-      //LogDebug("SiStripClusterizer") << "[SiPixelStubProducer::run] DetID" << DSViter->id;
+      //LogDebug("SiStripClusterizer") << "[SiPixelStubBuilder::run] DetID" << DSViter->id;
 
       std::vector<short> badChannels; 
       DetId detIdObject(DSViter->detId());
@@ -178,7 +178,7 @@ namespace cms
     }*/ 
 // end of DetUnit loop
     
-    //LogDebug ("SiPixelStubProducer") << " Executing " 
+    //LogDebug ("SiPixelStubBuilder") << " Executing " 
     //      << clusterMode_ << " resulted in " << numberOfClusters
     //				    << " SiPixelClusters in " << numberOfDetUnits << " DetUnits."; 
   }

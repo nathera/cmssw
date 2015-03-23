@@ -1,9 +1,9 @@
 
 #include "FWCore/PluginManager/interface/ModuleDef.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelStubProducer.h"
+#include "RecoLocalTracker/SiPixelStubBuilder/plugins/SiPixelStubBuilder.h"
 //
-using cms::SiPixelStubProducer;
+using cms::SiPixelStubBuilder;
 
-DEFINE_FWK_MODULE(SiPixelStubProducer);
+DEFINE_FWK_MODULE(SiPixelStubBuilder);
 
