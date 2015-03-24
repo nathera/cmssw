@@ -80,7 +80,7 @@ namespace cms
 
    // Step A.1: get input data
     //edm::Handle<PixelDigiCollection> pixDigis;
-    edm::Handle< edm::DetSetVector<SiPixelCluster> >  input;
+    edm::Handle< edmNew::DetSetVector<SiPixelCluster> >  input;
     e.getByLabel( src_, input);
 /*
     // Step A.2: get event setup
