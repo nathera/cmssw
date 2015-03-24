@@ -14,7 +14,6 @@
 
 // Data Formats
 #include "DataFormats/Common/interface/DetSetVector.h"
-#include "DataFormats/SiPixelDigi/interface/PixelDigi.h"
 #include "DataFormats/DetId/interface/DetId.h"
 
 
@@ -79,39 +78,54 @@ namespace cms
   {
     std::cout << "SiPixelStubBuilder::produce()" << std::endl;
 
-/*
-    // Step A.1: get input data
-    //edm::Handle<PixelDigiCollection> pixDigis;
-    edm::Handle< edmNew::DetSetVector<SiStripCluster> >  input;
-    e.getByLabel( src_, input);
 
-    std::cout << " ...getting SiStripClusters?" << std::endl;
+    // get input clusters data
+    edm::Handle< edmNew::DetSetVector<SiPixelCluster> >  ClustersHandle;
+    e.getByLabel( ClustersInputTag_, ClustersHandle);
 
-    // Is the SiStripCluster Empty?
+    // create the final output collection
+    std::auto_ptr< edmNew::DetSetVector< SiPixelCluster > > outputClusterAccept( new edmNew::DetSetVector< SiPixelCluster > );
+    std::auto_ptr< SiPixelStubCollectionNew > outputStubsAccepted( new SiPixelStubCollectionNew() );
+    std::auto_ptr< SiPixelStubCollectionNew > outputStubsRejected( new SiPixelStubCollectionNew() );
+
+    // ERICA::check::Are the Clusters Empty?
     int numberOfDetUnits = 0;
-    edmNew::DetSetVector<SiStripCluster>::const_iterator iterClu = (*input).begin();
-    for( ; iterClu != (*input).end(); iterClu++) {
+    edmNew::DetSetVector<SiPixelCluster>::const_iterator ClusterIter;
+    for( ClusterIter = (*ClustersHandle).begin() ; ClusterIter != (*ClustersHandle).end(); ClusterIter++) {
       ++numberOfDetUnits;
     }
 
-    std::cout << " ... SiStripClusters: " << numberOfDetUnits << std::endl;
-*/
+    // ERICA::check::Are the Clusters Empty?
+    *outputClusterAccept = *ClustersHandle;
+    int numberOfDetUnits_produced = 0;
+    edmNew::DetSetVector<SiPixelCluster>::const_iterator ClusterIter_new;
+    for( ClusterIter_new = (*outputClusterAccept).begin() ; ClusterIter_new != (*outputClusterAccept).end(); ClusterIter_new++) {
+      ++numberOfDetUnits_produced;
+    }
+
+
+    std::cout << " ... Number of clusters: " << numberOfDetUnits << std::endl;
+    std::cout << " ... Number of clusters produced: " << numberOfDetUnits_produced << std::endl;
+
 /*
     // Step A.2: get event setup
     edm::ESHandle<TrackerGeometry> geom;
     es.get<TrackerDigiGeometryRecord>().get( geom );
+*/
 
-    // Step B: create the final output collection
-    std::auto_ptr<SiPixelStubCollectionNew> output( new SiPixelStubCollectionNew() );
-    //FIXME: put a reserve() here
 
+/*
     // Step C: Iterate over DetIds and invoke the pixel clusterizer algorithm
     // on each DetUnit
     run(*input, geom, *output );
+*/
+    // write output to file
+    e.put( outputClusterAccept, "ClusterAccepted" );
+    e.put( outputStubsAccepted, "StubAccepted" );
+    e.put( outputStubsRejected, "StubRejected" );
 
-    // Step D: write output to file
-    e.put( output );
-
+    std::cout << " SiPixelStubBuilder has put in event. " << std::endl;
+/*
   }
 
   //---------------------------------------------------------------------------

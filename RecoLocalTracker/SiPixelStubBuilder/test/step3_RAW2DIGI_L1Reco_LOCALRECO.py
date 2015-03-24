@@ -21,6 +21,7 @@ process.load('Configuration.StandardSequences.L1Reco_cff')
 #process.load('RecoLocalTracker.SiStripRecHitConverter.SiStripRecHitMatcher_cff')
 #process.load('RecoLocalTracker.SiStripZeroSuppression.SiStripZeroSuppression_cff')
 #process.load('RecoLocalTracker.SiStripClusterizer.SiStripClusterizer_cff')
+process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('RecoLocalTracker.Configuration.RecoLocalTracker_cff')
 
 #NOT ERICA
@@ -58,7 +59,7 @@ process.configurationMetadata = cms.untracked.PSet(
 process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
+    outputCommands = cms.untracked.vstring( ('keep *_*_*_*') ),
     fileName = cms.untracked.string('file:step3_untilLOCALRECO.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
@@ -91,9 +92,10 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1Reco_step = cms.Path(process.L1Reco)
-process.striptrackerlocalreco = cms.Sequence(process.siStripZeroSuppression+process.siStripClusters+process.siPixelStubs)
-process.striptrackerlocalreco_step = cms.Path(process.striptrackerlocalreco)
-#process.trackerreconstruction_step         = cms.Path(process.trackerlocalreco)
+#process.pixeltrackerlocalreco = cms.Sequence(process.siPixelClusters*processsiPixelRecHits)
+#process.striptrackerlocalreco = cms.Sequence(process.siStripZeroSuppression+process.siStripClusters+process.siPixelStubs)
+#process.trackerlocalreco_step = cms.Path(process.trackerlocalreco+process.siPixelStubs)
+process.trackerlocalreco_step         = cms.Path(process.trackerlocalreco+process.siPixelStubs)
 #process.reconstruction_step = cms.Path(process.reconstruction)
 #process.prevalidation_step = cms.Path(process.prevalidation)
 #process.dqmoffline_step = cms.Path(process.DQMOffline)
@@ -103,7 +105,8 @@ process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
 #process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.prevalidation_step,process.validation_step,process.dqmoffline_step,process.FEVTDEBUGHLToutput_step,process.DQMoutput_step)
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.striptrackerlocalreco_step,process.FEVTDEBUGHLToutput_step)
+process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.trackerlocalreco_step,process.FEVTDEBUGHLToutput_step)
+#process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.FEVTDEBUGHLToutput_step)
 
 # customisation of the process.
 

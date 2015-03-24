@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
  
 siPixelStubs = cms.EDProducer("SiPixelStubBuilder",
-    Clusters = cms.InputTag('SiStripClusters'),
+    Clusters = cms.InputTag('siPixelClusters'),
 #     TTClusters = cms.InputTag("TTClustersFromPixelDigis", "ClusterInclusive"),
 )
 
