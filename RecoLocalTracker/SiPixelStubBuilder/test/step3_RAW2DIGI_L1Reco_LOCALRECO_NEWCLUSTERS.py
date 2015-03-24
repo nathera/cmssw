@@ -72,11 +72,9 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1Reco_step = cms.Path(process.L1Reco)
-<<<<<<< HEAD:RecoLocalTracker/SiPixelStubBuilder/test/step3_RAW2DIGI_L1Reco_LOCALRECO.py
 #process.pixeltrackerlocalreco = cms.Sequence(process.siPixelClusters*processsiPixelRecHits)
 #process.striptrackerlocalreco = cms.Sequence(process.siStripZeroSuppression+process.siStripClusters+process.siPixelStubs)
-#process.trackerlocalreco_step = cms.Path(process.trackerlocalreco+process.siPixelStubs)
-process.trackerlocalreco_step         = cms.Path(process.trackerlocalreco+process.siPixelStubs)
+process.trackerlocalreco_step  = cms.Path(process.trackerlocalreco+process.siPixelStubs)
 #process.reconstruction_step = cms.Path(process.reconstruction)
 #process.prevalidation_step = cms.Path(process.prevalidation)
 #process.dqmoffline_step = cms.Path(process.DQMOffline)
