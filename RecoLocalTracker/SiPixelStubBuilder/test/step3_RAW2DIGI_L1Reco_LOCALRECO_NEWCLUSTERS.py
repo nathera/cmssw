@@ -18,6 +18,7 @@ process.load('Configuration.StandardSequences.MagneticField_38T_PostLS1_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.L1Reco_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.load('Configuration.StandardSequences.Reconstruction_cff')
 #adding only recolocalreco
 process.load('RecoLocalTracker.Configuration.RecoLocalTracker_cff')
 
@@ -32,7 +33,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:step2_newclusters.root')
+    fileNames = cms.untracked.vstring('file:step2_newclusters_SLHC25.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -52,7 +53,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = cms.untracked.vstring( ('keep *_*_*_*') ),
-    fileName = cms.untracked.string('file:step3_newclusters.root'),
+    fileName = cms.untracked.string('file:step3_newclusters_SLHC25.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('GEN-SIM-RECO')

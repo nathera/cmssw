@@ -46,7 +46,7 @@ namespace cms
 //    maxTotalClusters_( conf.getParameter<int32_t>( "maxNumberOfClusters" ) )
   {
     //--- Declare to the EDM what kind of collections we will be making.
-    produces< edmNew::DetSetVector< SiPixelCluster > >( "ClusterAccepted" );
+    produces< edmNew::DetSetVector< Phase2TrackerCluster1D > >( "ClusterAccepted" );
     produces< SiPixelStubCollectionNew >( "StubAccepted" );
     produces< SiPixelStubCollectionNew >( "StubRejected" );
 
@@ -80,17 +80,17 @@ namespace cms
 
     // Step A.1: get input data
     // get input clusters data
-    edm::Handle< edmNew::DetSetVector<SiPixelCluster> >  ClustersHandle;
+    edm::Handle< edmNew::DetSetVector<Phase2TrackerCluster1D> >  ClustersHandle;
     e.getByLabel( ClustersInputTag_, ClustersHandle);
 
     // create the final output collection
-    std::auto_ptr< edmNew::DetSetVector< SiPixelCluster > > outputClusterAccept( new edmNew::DetSetVector< SiPixelCluster > );
+    std::auto_ptr< edmNew::DetSetVector< Phase2TrackerCluster1D > > outputClusterAccept( new edmNew::DetSetVector< Phase2TrackerCluster1D > );
     std::auto_ptr< SiPixelStubCollectionNew > outputStubsAccepted( new SiPixelStubCollectionNew() );
     std::auto_ptr< SiPixelStubCollectionNew > outputStubsRejected( new SiPixelStubCollectionNew() );
 
     // ERICA::check::Are the Clusters Empty?
     int numberOfDetUnits = 0;
-    edmNew::DetSetVector<SiPixelCluster>::const_iterator ClusterIter;
+    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator ClusterIter;
     for( ClusterIter = (*ClustersHandle).begin() ; ClusterIter != (*ClustersHandle).end(); ClusterIter++) {
       ++numberOfDetUnits;
     }
@@ -98,7 +98,7 @@ namespace cms
     // ERICA::check::Are the Clusters Empty?
     *outputClusterAccept = *ClustersHandle;
     int numberOfDetUnits_produced = 0;
-    edmNew::DetSetVector<SiPixelCluster>::const_iterator ClusterIter_new;
+    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator ClusterIter_new;
     for( ClusterIter_new = (*outputClusterAccept).begin() ; ClusterIter_new != (*outputClusterAccept).end(); ClusterIter_new++) {
       ++numberOfDetUnits_produced;
     }
