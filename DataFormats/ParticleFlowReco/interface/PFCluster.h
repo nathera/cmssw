@@ -50,6 +50,8 @@ namespace reco {
 
     typedef std::vector<std::pair<CaloClusterPtr::key_type,edm::Ptr<PFCluster> > > EEtoPSAssociation;
     typedef ROOT::Math::PositionVector3D<ROOT::Math::CylindricalEta3D<Double32_t> > REPPoint;
+    typedef ROOT::Math::DisplacementVector3D<ROOT::Math::CylindricalEta3D<Double32_t> > REPAxis;
+
   
     PFCluster() : CaloCluster(CaloCluster::particleFlow), layer_(PFLayer::NONE), color_(1) {}
 
@@ -77,7 +79,13 @@ namespace reco {
     PFLayer::Layer  layer() const;
     
     /// cluster energy
-    double        energy() const {return energy_;}
+    double        energy()   const {return energy_;}
+    // had or em energies
+    double        emEnergy()  const {return emEnergy_;}    
+    double        hadEnergy() const {return hadEnergy_;}
+    // set them
+    void          setEmEnergy(double em)   { emEnergy_ = em; }
+    void          setHadEnergy(double had) { hadEnergy_ = had; }
 
     /// cluster time
     double        time() const {return time_;}
@@ -89,11 +97,19 @@ namespace reco {
     /// cluster position: rho, eta, phi
     const REPPoint&       positionREP() const {return posrep_;}
     
+    // cluster axis
+    void setAxis(const math::XYZVector& a) { axis_=a; }
+    const math::XYZVector& axis()    const { return axis_; }
+    const REPAxis&         axisREP() const { return axisrep_; }
+    
     /// computes posrep_ once and for all
     void calculatePositionREP() {
       posrep_.SetCoordinates( position_.Rho(), 
 			      position_.Eta(), 
 			      position_.Phi() ); 
+      axisrep_.SetCoordinates( axis_.Rho(),
+			       axis_.Eta(),
+			       axis_.Phi() );
     }
     
     /// \todo move to PFClusterTools
@@ -171,7 +187,12 @@ namespace reco {
     
     /// cluster position: rho, eta, phi (transient)
     REPPoint            posrep_;
+    math::XYZVector     axis_;
+    REPAxis             axisrep_;
 
+    //Lindsey: add em/had energies
+    double emEnergy_,hadEnergy_;
+    
     ///Michalis :Add timing information
     double time_;
     double depth_;

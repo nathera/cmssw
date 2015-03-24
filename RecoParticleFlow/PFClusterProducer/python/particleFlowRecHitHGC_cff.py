@@ -4,4 +4,4 @@ from RecoParticleFlow.PFClusterProducer.particleFlowRecHitHGCHEB_cfi import *
 
 particleFlowRecHitHGC = cms.Sequence( particleFlowRecHitHGCEE  +
                                       particleFlowRecHitHGCHEF +
-                                      particleFlowRecHitHGCHEB   )
+                                      particleFlowRecHitHGCHEB )

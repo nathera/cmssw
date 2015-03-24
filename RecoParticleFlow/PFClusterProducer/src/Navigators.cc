@@ -11,6 +11,7 @@
 #include "RecoParticleFlow/PFClusterProducer/interface/PFRecHitCaloNavigator.h"
 #include "RecoParticleFlow/PFClusterProducer/interface/PFRecHitCaloNavigatorWithTime.h"
 #include "RecoParticleFlow/PFClusterProducer/interface/PFECALHashNavigator.h"
+#include "RecoParticleFlow/PFClusterProducer/interface/HGCRecHitNavigator.h"
 
 
 class PFRecHitEcalBarrelNavigatorWithTime : public PFRecHitCaloNavigatorWithTime<EBDetId,EcalBarrelTopology> {
@@ -205,6 +206,13 @@ public:
   }
 };
 
+typedef HGCRecHitNavigator<PFLayer::HGC_ECAL,
+			   PFRecHitHGCEENavigator,
+			   PFLayer::HGC_HCALF,
+			   PFRecHitHGCHENavigator,
+			   PFLayer::HGC_HCALB,
+			   PFRecHitHGCHENavigator> PFRecHitHGCNavigator;
+
 EDM_REGISTER_PLUGINFACTORY(PFRecHitNavigationFactory, "PFRecHitNavigationFactory");
 
 DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitEcalBarrelNavigator, "PFRecHitEcalBarrelNavigator");
@@ -212,6 +220,7 @@ DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitEcalEndcapNavigator, "PFRec
 DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitShashlikNavigator, "PFRecHitShashlikNavigator");
 DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitHGCEENavigator, "PFRecHitHGCEENavigator");
 DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitHGCHENavigator, "PFRecHitHGCHENavigator");
+DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitHGCNavigator, "PFRecHitHGCNavigator");
 DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitEcalBarrelNavigatorWithTime, "PFRecHitEcalBarrelNavigatorWithTime");
 DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitEcalEndcapNavigatorWithTime, "PFRecHitEcalEndcapNavigatorWithTime");
 DEFINE_EDM_PLUGIN(PFRecHitNavigationFactory, PFRecHitShashlikNavigatorWithTime, "PFRecHitShashlikNavigatorWithTime");

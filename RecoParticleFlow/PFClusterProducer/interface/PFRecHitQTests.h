@@ -2,9 +2,6 @@
 #define RecoParticleFlow_PFClusterProducer_PFEcalRecHitQTests_h
 
 #include "RecoParticleFlow/PFClusterProducer/interface/PFRecHitQTestBase.h"
-
-
-
 //
 //  Quality test that checks threshold
 //
@@ -119,7 +116,7 @@ class PFRecHitQTestThresholdInMIPs : public PFRecHitQTestBase {
     double threshold_,mip_,recHitEnergyMultiplier_;    
 
   bool pass(const reco::PFRecHit& hit) {
-    const double eta_correction = std::abs(std::tanh(hit.position().Eta()));
+    const double eta_correction = 1.0;//std::abs(std::tanh(hit.position().Eta()));
     // coth = 1/tanh && convert PF hit energy back in keV to compare to MIP
     const double hitValueInMIPs = 1e6*hit.energy()*eta_correction/mip_;
     //std::cout << "hit value in MIPs : " << hitValueInMIPs <<std::endl;
@@ -269,6 +266,7 @@ class PFRecHitQTestHCALTimeVsDepth : public PFRecHitQTestBase {
 	minTimes_.push_back(psets[i].getParameter<double>("minTime"));
 	maxTimes_.push_back(psets[i].getParameter<double>("maxTime"));
 	thresholds_.push_back(psets[i].getParameter<double>("threshold"));
+	endcap_.push_back(psets[i].getParameter<bool>("endcap"));
       }
     }
 
@@ -301,11 +299,12 @@ class PFRecHitQTestHCALTimeVsDepth : public PFRecHitQTestBase {
     std::vector<double> minTimes_;
     std::vector<double> maxTimes_;
     std::vector<double> thresholds_;
+    std::vector<bool> endcap_;
 
     bool test(unsigned DETID,double energy,double time,bool& clean) {
       HcalDetId detid(DETID);
       for (unsigned int i=0;i<depths_.size();++i) {
-	if (detid.depth() == depths_[i]) {
+	if (detid.depth() == depths_[i] && detid.subdet()==(endcap_[i]?2:1)) {
 	  if ((time <minTimes_[i] || time >maxTimes_[i] ) &&  energy>thresholds_[i])
 	    {
 	      clean=true;

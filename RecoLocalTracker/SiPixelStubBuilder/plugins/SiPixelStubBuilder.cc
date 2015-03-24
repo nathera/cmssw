@@ -78,7 +78,7 @@ namespace cms
   {
     std::cout << "SiPixelStubBuilder::produce()" << std::endl;
 
-
+    // Step A.1: get input data
     // get input clusters data
     edm::Handle< edmNew::DetSetVector<SiPixelCluster> >  ClustersHandle;
     e.getByLabel( ClustersInputTag_, ClustersHandle);

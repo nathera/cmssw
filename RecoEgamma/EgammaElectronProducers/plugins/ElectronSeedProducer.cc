@@ -83,6 +83,11 @@ ElectronSeedProducer::ElectronSeedProducer( const edm::ParameterSet& iConfig )
      {
       hcalCfgBarrel.useTowers = true ;
       hcalCfgBarrel.hcalTowers = conf_.getParameter<edm::InputTag>("hcalTowers") ;
+      //here the HCAL clusters
+      if (hcalCfgBarrel.hOverEMethod==3)
+       { 
+        hcalCfgBarrel.hcalClusters = conf_.getParameter<edm::InputTag>("barrelHCALClusters") ;
+       }
      }
     hcalCfgBarrel.hOverEPtMin = conf_.getParameter<double>("hOverEPtMin") ;
     hcalHelperBarrel_ = new ElectronHcalHelper(hcalCfgBarrel) ;
@@ -95,6 +100,11 @@ ElectronSeedProducer::ElectronSeedProducer( const edm::ParameterSet& iConfig )
      {
       hcalCfgEndcap.useTowers = true ;
       hcalCfgEndcap.hcalTowers = conf_.getParameter<edm::InputTag>("hcalTowers") ;
+      //here the HCAL clusters
+      if (hcalCfgEndcap.hOverEMethod==3)
+       { 
+        hcalCfgEndcap.hcalClusters = conf_.getParameter<edm::InputTag>("endcapHCALClusters") ;
+       }
      }
     hcalCfgEndcap.hOverEPtMin = conf_.getParameter<double>("hOverEPtMin") ;
     hcalHelperEndcap_ = new ElectronHcalHelper(hcalCfgEndcap) ;
@@ -251,20 +261,30 @@ void ElectronSeedProducer::filterClusters
        if (applyHOverECut_)
         {
 	  if (detector==EcalBarrel) {
-	    had1 = hcalHelperBarrel_->hcalESumDepth1(scl);
-	    had2 = hcalHelperBarrel_->hcalESumDepth2(scl);
+	    if( hcalHelperEndcap_->getConfig().hOverEMethod != 3 ) {
+	      had1 = hcalHelperBarrel_->hcalESumDepth1(scl);
+	      had2 = hcalHelperBarrel_->hcalESumDepth2(scl);
+	    } else {
+	      had1 = hcalHelperBarrel_->HCALClustersBehindSC(scl);
+	    }
 	  } else if (detector==EcalEndcap || detector==EcalShashlik) {
-	    had1 = hcalHelperEndcap_->hcalESumDepth1(scl);
-	    had2 = hcalHelperEndcap_->hcalESumDepth2(scl);
-	  }
+	    if( hcalHelperEndcap_->getConfig().hOverEMethod != 3 ) {
+	      had1 = hcalHelperEndcap_->hcalESumDepth1(scl);
+	      had2 = hcalHelperEndcap_->hcalESumDepth2(scl);
+	    } else {
+	      had1 = hcalHelperEndcap_->HCALClustersBehindSC(scl);
+	    }
+	  } else if (detector==EcalEndcap || detector==HGCEE) {
+	    had1 = hcalHelperEndcap_->HCALClustersBehindSC(scl);
+      }
          had = had1+had2 ;
          scle = scl.energy() ;
-	 int component = scl.seed()->hitsAndFractions()[0].first.det() ;
+	     int component = scl.seed()->hitsAndFractions()[0].first.det() ;
          //int detector = scl.seed()->hitsAndFractions()[0].first.subdetId() ;
          if (component==DetId::Ecal && detector==EcalBarrel && (had<maxHBarrel_ || had/scle<maxHOverEBarrel_)) HoeVeto=true;
          else if (component==DetId::Ecal && (detector==EcalEndcap || detector==EcalShashlik ) && fabs(sclEta) < 2.65 && (had<maxHEndcaps_ || had/scle<maxHOverEEndcaps_)) HoeVeto=true;
          else if (component==DetId::Ecal && (detector==EcalEndcap || detector==EcalShashlik ) && fabs(sclEta) > 2.65 && (had<maxHEndcaps_ || had/scle<maxHOverEOuterEndcaps_)) HoeVeto=true;
-	 else if (component==DetId::Forward && detector==HGCEE && (had<maxHEndcaps_ || had/scle<maxHOverEEndcaps_)) HoeVeto=true;
+	     else if (component==DetId::Forward && detector==HGCEE && (had<maxHEndcaps_ || had/scle<maxHOverEEndcaps_)) HoeVeto=true;
          if (HoeVeto)
           {
            sclRefs.push_back(edm::Ref<reco::SuperClusterCollection>(superClusters,i)) ;
