@@ -39,15 +39,17 @@ namespace cms
   //---------------------------------------------------------------------------
   SiPixelStubBuilder::SiPixelStubBuilder(edm::ParameterSet const& conf) 
     : 
-    _conf(conf),
+    Conf_(conf),
 //    clusterMode_("None"),     // bogus
 //    _stubBuilder(0),          // the default, in case we fail to make one
 //    readyToCluster_(false),   // since we obviously aren't
-    src_( conf.getParameter<edm::InputTag>( "src" ) )
+    ClustersInputTag_( conf.getParameter<edm::InputTag>( "Clusters" ) )
 //    maxTotalClusters_( conf.getParameter<int32_t>( "maxNumberOfClusters" ) )
   {
     //--- Declare to the EDM what kind of collections we will be making.
-    produces<SiPixelStubCollectionNew>(); 
+    produces< edmNew::DetSetVector< SiPixelCluster > >( "ClusterAccepted" );
+    produces< SiPixelStubCollectionNew >( "StubAccepted" );
+    produces< SiPixelStubCollectionNew >( "StubRejected" );
 
 //    std::string payloadType = conf.getParameter<std::string>( "payloadType" );
 
@@ -67,7 +69,7 @@ namespace cms
   //void SiPixelStubBuilder::beginJob( const edm::EventSetup& es ) 
   void SiPixelStubBuilder::beginJob( ) 
   {
-    std::cout << "SiPixelStubBuilder::beginJob( )";
+    std::cout << "SiPixelStubBuilder::beginJob()" << std::endl;
   }
   
   //---------------------------------------------------------------------------
@@ -75,13 +77,25 @@ namespace cms
   //---------------------------------------------------------------------------
   void SiPixelStubBuilder::produce(edm::Event& e, const edm::EventSetup& es)
   {
-    std::cout << "SiPixelStubBuilder::produce( )";
+    std::cout << "SiPixelStubBuilder::produce()" << std::endl;
 
-
-   // Step A.1: get input data
+/*
+    // Step A.1: get input data
     //edm::Handle<PixelDigiCollection> pixDigis;
-    edm::Handle< edm::DetSetVector<SiPixelCluster> >  input;
+    edm::Handle< edmNew::DetSetVector<SiStripCluster> >  input;
     e.getByLabel( src_, input);
+
+    std::cout << " ...getting SiStripClusters?" << std::endl;
+
+    // Is the SiStripCluster Empty?
+    int numberOfDetUnits = 0;
+    edmNew::DetSetVector<SiStripCluster>::const_iterator iterClu = (*input).begin();
+    for( ; iterClu != (*input).end(); iterClu++) {
+      ++numberOfDetUnits;
+    }
+
+    std::cout << " ... SiStripClusters: " << numberOfDetUnits << std::endl;
+*/
 /*
     // Step A.2: get event setup
     edm::ESHandle<TrackerGeometry> geom;

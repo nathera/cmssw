@@ -20,7 +20,8 @@
 #include "DataFormats/Common/interface/DetSetVector.h"
 #include "DataFormats/Common/interface/DetSetVectorNew.h"
 #include "DataFormats/SiPixelDigi/interface/PixelDigi.h"
-#include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
+//#include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
+#include "DataFormats/SiStripCluster/interface/SiStripCluster.h"
 #include "DataFormats/SiPixelStub/interface/SiPixelStub.h"
 
 
@@ -60,8 +61,8 @@ namespace cms
 
   private:
 
-    edm::ParameterSet _conf;
-    edm::InputTag src_;
+    edm::ParameterSet Conf_;
+    edm::InputTag ClustersInputTag_;
 /*
     std::string clusterMode_;               // user's choice of the clusterizer
     SiPixelStubBuilderBase * _stubBuilder;    // what we got (for now, one ptr to base class)

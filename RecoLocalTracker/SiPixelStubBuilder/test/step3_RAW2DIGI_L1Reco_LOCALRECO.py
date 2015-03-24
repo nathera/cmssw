@@ -39,7 +39,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:ConfigTest/step2.root')
+    fileNames = cms.untracked.vstring('file:step2.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -59,7 +59,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
-    fileName = cms.untracked.string('file:ConfigTest/step3_ultilLOCALRECO.root'),
+    fileName = cms.untracked.string('file:step3_untilLOCALRECO.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('GEN-SIM-RECO')
