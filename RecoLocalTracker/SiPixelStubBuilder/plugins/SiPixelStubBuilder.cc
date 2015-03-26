@@ -168,14 +168,14 @@ namespace cms
       if (!geomDetUnit) break;
 
       // Number of clusters
-      unsigned int nClustersPixel(0), nClustersStrip(0);
+      //unsigned int nClustersPixel(0), nClustersStrip(0);
 
       // Loop over the clusters in the detector unit
       for (edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
 
-            MeasurementPoint mpClu(clustIt->center(), clustIt->column() + 0.5);
-            Local3DPoint localPosClu = geomDetUnit->topology().localPosition(mpClu);
-            Global3DPoint globalPosClu = geomDetUnit->surface().toGlobal(localPosClu);
+      //      MeasurementPoint mpClu(clustIt->center(), clustIt->column() + 0.5);
+      //      Local3DPoint localPosClu = geomDetUnit->topology().localPosition(mpClu);
+      //      Global3DPoint globalPosClu = geomDetUnit->surface().toGlobal(localPosClu);
       }
     }
 

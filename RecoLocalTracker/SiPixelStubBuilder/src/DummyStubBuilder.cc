@@ -97,13 +97,10 @@ bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet)
 //!  Input and output data stored in DetSet
 */
 //----------------------------------------------------------------------------
-void DummyStubBuilder::buildDetUnit( const edm::DetSet<SiPixelCluster> & input, 
-                                     const PixelGeomDetUnit * pixDet,
-                                     edmNew::DetSetVector<SiPixelStub>::FastFiller& output)  {
+void DummyStubBuilder::buildDetUnit( const edm::DetSet<Phase2TrackerCluster1D> & input, 
+                                     output_t& output)  {
   
-//   SiClusterIterator begin = input.begin();
-//   SiClusterIterator end   = input.end();
-  
+//  buildDetUnit_(input, output);  
   
   
 }
