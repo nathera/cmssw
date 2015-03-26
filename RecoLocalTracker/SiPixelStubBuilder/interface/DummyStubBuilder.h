@@ -21,6 +21,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include <vector>
+#include <map>
 
 
 class DummyStubBuilder : public SiPixelStubBuilderBase {
@@ -29,8 +30,11 @@ class DummyStubBuilder : public SiPixelStubBuilderBase {
   DummyStubBuilder(edm::ParameterSet const& conf);
   ~DummyStubBuilder();
 
+  // group clusters in stack modules
+  std::vector< std::pair< int, std::vector<Phase2TrackerCluster1D> > > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,const TrackerTopology& topo);
+
   // Full I/O in DetSet
-  void buildDetUnit( const edm::DetSet<Phase2TrackerCluster1D> & input, 
+  void buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input, 
                      output_t& output);
 //  void build( const edm::DetSet<Phase2TrackerCluster1D> & input, 
 //                     output_t::FastFiller& output);

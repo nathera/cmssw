@@ -97,10 +97,39 @@ bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet)
 //!  Input and output data stored in DetSet
 */
 //----------------------------------------------------------------------------
-void DummyStubBuilder::buildDetUnit( const edm::DetSet<Phase2TrackerCluster1D> & input, 
+std::vector< std::pair< int, std::vector<Phase2TrackerCluster1D> > > DummyStubBuilder::groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters, const TrackerTopology& topo){
+
+  if(clusters.empty())
+    return std::vector< std::pair< int, vector<Phase2TrackerCluster1D> > >(); 
+
+  std::vector< std::pair< int, vector<Phase2TrackerCluster1D> > > result;
+  result.reserve( clusters.size() );
+
+  int numberOfDSV = 0;
+  edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter;
+  for( DSViter = clusters.begin() ; DSViter != clusters.end(); DSViter++){
+    ++numberOfDSV;
+    // get the detector unit's id
+    unsigned int rawid(DSViter->detId());
+    DetId detId(rawid);
+    unsigned int layer(getLayerNumber(detId, &topo));
+    unsigned int module(getModuleNumber(detId, &topo));
+    std::cout << rawid << std::endl;
+    std::cout << layer << std::endl;
+    std::cout << module << std::endl;
+//      if(module%2 == 0){
+
+  }
+
+  std::cout << " ... Number of DSV in run: " << numberOfDSV << std::endl;
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void DummyStubBuilder::buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input, 
                                      output_t& output)  {
   
-//  buildDetUnit_(input, output);  
+  buildDetUnit_(input, output);  
   
   
 }

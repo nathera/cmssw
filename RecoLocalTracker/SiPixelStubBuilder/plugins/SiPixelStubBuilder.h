@@ -63,9 +63,11 @@ namespace cms
              const TrackerTopology& ,
              edmNew::DetSetVector<Phase2TrackerCluster1D> );
 
-    //--- Get the layer given the geometry
+    //--- Get the layer && module given the geometry
     unsigned int getLayerNumber(const DetId& , 
 		 	        const TrackerTopology* );
+    unsigned int getModuleNumber(const DetId& , 
+		 	         const TrackerTopology* );
 
   private:
 

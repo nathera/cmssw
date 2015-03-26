@@ -24,6 +24,7 @@
 
 // STL
 #include <vector>
+#include <map>
 #include <memory>
 #include <string>
 #include <iostream>
@@ -144,47 +145,43 @@ namespace cms
       return;
     }
 
+    std::vector< std::pair< int, std::vector<Phase2TrackerCluster1D> > > groupClusterBySM;    
+    groupClusterBySM = StubBuilder_->groupinginStackModules(clusters, topo);
+
+
     // ERICA::check::Are the Clusters Empty?
-    int numberOfDSV = 0;
+    int numberOfDS = 0;
+//    int numberOfStubs = 0;
     edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter;
+    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter2;
     for( DSViter = clusters.begin() ; DSViter != clusters.end(); DSViter++){
 
-      ++numberOfDSV;
  
       // get the detector unit's id
       unsigned int rawid(DSViter->detId());
       DetId detId(rawid);
-      unsigned int layer(getLayerNumber(detId, &topo));
+      //unsigned int layer(getLayerNumber(detId, &topo));
+      //unsigned int module(getModuleNumber(detId, &topo));
 
-      std::cout << layer << std::endl;
-
+      
       // get the geom of the tracker
       const GeomDetUnit* geomDetUnit(geom.idToDetUnit(detId));
       const PixelGeomDetUnit* theGeomDet = dynamic_cast< const PixelGeomDetUnit* >(geomDetUnit);
       const PixelTopology& topol = theGeomDet->specificTopology();
 
-      std::cout << topol.ncolumns() << std::endl;
+      if(topol.ncolumns() == 32) std::cout << "Pixel module!" << std::endl;
+      else if(topol.ncolumns() == 2 ) std::cout << "Strip module!" << std::endl;
+      else std::cout << "no module?!" << std::endl;
 
       if (!geomDetUnit) break;
 
-      // Number of clusters
-      //unsigned int nClustersPixel(0), nClustersStrip(0);
 
-      // Loop over the clusters in the detector unit
-      for (edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
 
-      //      MeasurementPoint mpClu(clustIt->center(), clustIt->column() + 0.5);
-      //      Local3DPoint localPosClu = geomDetUnit->topology().localPosition(mpClu);
-      //      Global3DPoint globalPosClu = geomDetUnit->surface().toGlobal(localPosClu);
-      }
-    }
 
-    std::cout << " ... Number of DSV in run: " << numberOfDSV << std::endl;
+
 
 /*
- 
-      // Produce clusters for this DetUnit and store them in 
-      // a DetSet
+      // Produce stubs for this DetUnit and store them in a DetSetVector
       edmNew::DetSetVector<SiPixelCluster>::FastFiller spc(output, DSViter->detId());
       _stubBuilder->clusterizeDetUnit(*DSViter, pixDet, badChannels, spc);
       if ( spc.empty() ) {
@@ -192,6 +189,31 @@ namespace cms
       } else {
 	numberOfClusters += spc.size();
       }
+*/
+      // Number of clusters
+      //unsigned int nClustersPixel(0), nClustersStrip(0);
+
+      // Loop over the clusters in the detector unit
+      for (edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
+
+        numberOfDS++;
+
+        MeasurementPoint mpClu(clustIt->center(), clustIt->column() + 0.5);
+        Local3DPoint localPosClu = geomDetUnit->topology().localPosition(mpClu);
+        Global3DPoint globalPosClu = geomDetUnit->surface().toGlobal(localPosClu);
+
+      //  std::cout << "Cluster #" << numberOfDS << " in DetSet#" << numberOfDSV << std::endl;
+        std::cout << "\t local  pos " << localPosClu << std::endl;
+        std::cout << "\t global pos " << globalPosClu << std::endl;
+
+      }
+      std::cout << std::endl;
+    }
+
+    std::cout << " ... Number of DS in run: " << numberOfDS << std::endl;
+
+/*
+ 
 
       if ((maxTotalClusters_ >= 0) && (numberOfClusters > maxTotalClusters_)) {
         edm::LogError("TooManyClusters") <<  "Limit on the number of clusters exceeded. An empty cluster collection will be produced instead.\n";
@@ -210,9 +232,27 @@ namespace cms
 
   unsigned int SiPixelStubBuilder::getLayerNumber(const DetId& detid, const TrackerTopology* topo) {
     if (detid.det() == DetId::Tracker) {
-        if (detid.subdetId() == PixelSubdetector::PixelBarrel) return (topo->pxbLayer(detid));
+        if (detid.subdetId() == PixelSubdetector::PixelBarrel) {
+          return (topo->pxbLayer(detid));
+        }
         // ERICA::chech: E+ 100; E- 200 : needed?
-        else if (detid.subdetId() == PixelSubdetector::PixelEndcap) return (100 * topo->pxfSide(detid) + topo->pxfDisk(detid));
+        else if (detid.subdetId() == PixelSubdetector::PixelEndcap) {
+          return (100 * topo->pxfSide(detid) + topo->pxfDisk(detid));
+        }
+        else return 999;
+    }
+    return 999;
+  }
+
+
+  unsigned int SiPixelStubBuilder::getModuleNumber(const DetId& detid, const TrackerTopology* topo) {
+    if (detid.det() == DetId::Tracker) {
+        if (detid.subdetId() == PixelSubdetector::PixelBarrel) {
+          return ( topo->pxbModule(detid) );
+        }
+        else if (detid.subdetId() == PixelSubdetector::PixelEndcap) {
+          return ( topo->pxfModule(detid) );
+        }
         else return 999;
     }
     return 999;
