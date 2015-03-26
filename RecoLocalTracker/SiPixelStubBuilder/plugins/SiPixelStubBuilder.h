@@ -14,15 +14,18 @@
 #include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelStubBuilderBase.h"
 
 //#include "Geometry/CommonDetUnit/interface/TrackingGeometry.h"
+//#include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
 
+#include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
+#include "Geometry/CommonDetUnit/interface/GeomDetUnit.h"
+#include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
 
+#include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 #include "DataFormats/Common/interface/DetSetVector.h"
 #include "DataFormats/Common/interface/DetSetVectorNew.h"
 #include "DataFormats/SiPixelDigi/interface/PixelDigi.h"
-//#include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 #include "DataFormats/Phase2TrackerCluster/interface/Phase2TrackerCluster1D.h"
-#include "DataFormats/SiStripCluster/interface/SiStripCluster.h"
 #include "DataFormats/SiPixelStub/interface/SiPixelStub.h"
 
 
@@ -43,35 +46,38 @@ namespace cms
   class SiPixelStubBuilder : public edm::EDProducer {
   public:
     //--- Constructor, virtual destructor (just in case)
-    explicit SiPixelStubBuilder(const edm::ParameterSet& conf);
+    explicit SiPixelStubBuilder(const edm::ParameterSet& );
     virtual ~SiPixelStubBuilder();
 
-//    void setupStubBuilder();
+    void setupStubFindingAlgorithm();
 
     // Begin Job
     //virtual void beginJob( const edm::EventSetup& );
     virtual void beginJob( );
 
     //--- The top-level event method.
-    virtual void produce(edm::Event& e, const edm::EventSetup& c);
+    virtual void produce(edm::Event&, const edm::EventSetup& );
 
     //--- Execute the algorithm(s).
-//    void run(const edm::DetSetVector<SiPixelCluster>   & input,
-//	     edm::ESHandle<TrackerGeometry>       & geom,
-//             edmNew::DetSetVector<SiPixelStub> & output);
+    void run(const edmNew::DetSetVector<Phase2TrackerCluster1D>& ,
+ 	     const TrackerGeometry& ,
+             const TrackerTopology& ,
+             edmNew::DetSetVector<Phase2TrackerCluster1D> );
+
+    //--- Get the layer given the geometry
+    unsigned int getLayerNumber(const DetId& , 
+		 	        const TrackerTopology* );
 
   private:
 
     edm::ParameterSet Conf_;
     edm::InputTag ClustersInputTag_;
-/*
-    std::string clusterMode_;               // user's choice of the clusterizer
-    SiPixelStubBuilderBase * _stubBuilder;    // what we got (for now, one ptr to base class)
-    bool readyToCluster_;                   // needed clusterizers valid => good to go!
+    std::string StubBuilderAlgo_;               
+    SiPixelStubBuilderBase * StubBuilder_;
+    bool ReadyToBuild_;
 
     //! Optional limit on the total number of clusters
-    int32_t maxTotalClusters_;
-*/
+    //int32_t maxTotalStubs_;
   };
 }
 

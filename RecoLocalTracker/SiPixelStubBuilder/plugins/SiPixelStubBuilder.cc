@@ -1,6 +1,6 @@
 /** SiPixelStubBuilder.cc
  * ---------------------------------------------------------------
- * Natalie Heracleous modified from SiPixelClusterBuilder 
+ * Natalie Heracleous, Erica Brondolin
  * ---------------------------------------------------------------
  */
 
@@ -9,13 +9,14 @@
 #include "RecoLocalTracker/SiPixelStubBuilder/interface/DummyStubBuilder.h"
 
 // Geometry
+#include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
+#include "Geometry/CommonDetUnit/interface/GeomDetUnit.h"
 #include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
 
 // Data Formats
 #include "DataFormats/Common/interface/DetSetVector.h"
 #include "DataFormats/DetId/interface/DetId.h"
-
 
 // Framework
 #include "DataFormats/Common/interface/Handle.h"
@@ -36,13 +37,12 @@ namespace cms
   //---------------------------------------------------------------------------
   //!  Constructor: set the ParameterSet and defer all thinking to setupStubBuilder().
   //---------------------------------------------------------------------------
-  SiPixelStubBuilder::SiPixelStubBuilder(edm::ParameterSet const& conf) 
-    : 
+  SiPixelStubBuilder::SiPixelStubBuilder(edm::ParameterSet const& conf) : 
     Conf_(conf),
-//    clusterMode_("None"),     // bogus
-//    _stubBuilder(0),          // the default, in case we fail to make one
-//    readyToCluster_(false),   // since we obviously aren't
-    ClustersInputTag_( conf.getParameter<edm::InputTag>( "Clusters" ) )
+    ClustersInputTag_( conf.getParameter<edm::InputTag>( "Clusters" ) ),
+    StubBuilderAlgo_("None"),
+    StubBuilder_(0),
+    ReadyToBuild_(false)
 //    maxTotalClusters_( conf.getParameter<int32_t>( "maxNumberOfClusters" ) )
   {
     //--- Declare to the EDM what kind of collections we will be making.
@@ -50,19 +50,15 @@ namespace cms
     produces< SiPixelStubCollectionNew >( "StubAccepted" );
     produces< SiPixelStubCollectionNew >( "StubRejected" );
 
-//    std::string payloadType = conf.getParameter<std::string>( "payloadType" );
-
-
-
     //--- Make the algorithm(s) according to what the user specified
     //--- in the ParameterSet.
-//    setupStubBuilder();
+    setupStubFindingAlgorithm();
 
   }
 
   // Destructor
   SiPixelStubBuilder::~SiPixelStubBuilder() { 
-//    delete _stubBuilder;
+    delete StubBuilder_;
   }  
 
   //void SiPixelStubBuilder::beginJob( const edm::EventSetup& es ) 
@@ -74,28 +70,32 @@ namespace cms
   //---------------------------------------------------------------------------
   //! The "Event" entrypoint: gets called by framework for every event
   //---------------------------------------------------------------------------
-  void SiPixelStubBuilder::produce(edm::Event& e, const edm::EventSetup& es)
+  void SiPixelStubBuilder::produce(edm::Event& event, const edm::EventSetup& eventSetup)
   {
-    std::cout << "SiPixelStubBuilder::produce()" << std::endl;
+    std::cout << "SiPixelStubBuilder::produce() begin" << std::endl;
 
-    // Step A.1: get input data
     // get input clusters data
     edm::Handle< edmNew::DetSetVector<Phase2TrackerCluster1D> >  ClustersHandle;
-    e.getByLabel( ClustersInputTag_, ClustersHandle);
+    event.getByLabel( ClustersInputTag_, ClustersHandle);
 
     // create the final output collection
     std::auto_ptr< edmNew::DetSetVector< Phase2TrackerCluster1D > > outputClusterAccept( new edmNew::DetSetVector< Phase2TrackerCluster1D > );
     std::auto_ptr< SiPixelStubCollectionNew > outputStubsAccepted( new SiPixelStubCollectionNew() );
     std::auto_ptr< SiPixelStubCollectionNew > outputStubsRejected( new SiPixelStubCollectionNew() );
 
-    // ERICA::check::Are the Clusters Empty?
-    int numberOfDetUnits = 0;
-    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator ClusterIter;
-    for( ClusterIter = (*ClustersHandle).begin() ; ClusterIter != (*ClustersHandle).end(); ClusterIter++) {
-      ++numberOfDetUnits;
-    }
+    // get the geometry
+    edm::ESHandle< TrackerGeometry > geomHandle;
+    eventSetup.get< TrackerDigiGeometryRecord >().get( geomHandle );
+    const TrackerGeometry* tkGeom = &(*geomHandle);    
 
-    // ERICA::check::Are the Clusters Empty?
+    edm::ESHandle< TrackerTopology > tTopoHandle;
+    eventSetup.get< IdealGeometryRecord >().get(tTopoHandle);
+    const TrackerTopology* tkTopo = tTopoHandle.product();
+
+    // running the stub building algorithm
+    run( *ClustersHandle, *tkGeom, *tkTopo, *outputClusterAccept);//, *outputStubsAccepted, *outputStubsRejected );
+
+    // ERICA::check::Are the output clusters empty?
     *outputClusterAccept = *ClustersHandle;
     int numberOfDetUnits_produced = 0;
     edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator ClusterIter_new;
@@ -103,91 +103,86 @@ namespace cms
       ++numberOfDetUnits_produced;
     }
 
-
-    std::cout << " ... Number of clusters: " << numberOfDetUnits << std::endl;
     std::cout << " ... Number of clusters produced: " << numberOfDetUnits_produced << std::endl;
 
-/*
-    // Step A.2: get event setup
-    edm::ESHandle<TrackerGeometry> geom;
-    es.get<TrackerDigiGeometryRecord>().get( geom );
-*/
-
-
-/*
-    // Step C: Iterate over DetIds and invoke the pixel clusterizer algorithm
-    // on each DetUnit
-    run(*input, geom, *output );
-*/
     // write output to file
-    e.put( outputClusterAccept, "ClusterAccepted" );
-    e.put( outputStubsAccepted, "StubAccepted" );
-    e.put( outputStubsRejected, "StubRejected" );
+    event.put( outputClusterAccept, "ClusterAccepted" );
+    event.put( outputStubsAccepted, "StubAccepted" );
+    event.put( outputStubsRejected, "StubRejected" );
 
-    std::cout << " SiPixelStubBuilder has put in event. " << std::endl;
-/*
+    std::cout << "SiPixelStubBuilder::produce() end" << std::endl;
+
   }
 
   //---------------------------------------------------------------------------
-  //!  Set up the specific algorithm we are going to use.  
-  //!  TO DO: in the future, we should allow for a different algorithm for 
-  //!  each detector subset (e.g. barrel vs forward, per layer, etc).
+  //  Set up the specific algorithm we are going to use.  
   //---------------------------------------------------------------------------
-  void SiPixelStubBuilder::setupStubBuilder()  {
-    clusterMode_ = 
-    _conf.getUntrackedParameter<std::string>("ClusterMode","DummyStubBuilder");
+  void SiPixelStubBuilder::setupStubFindingAlgorithm()  {
+    StubBuilderAlgo_ = Conf_.getUntrackedParameter<std::string>("AlgorithmName","DummyStubBuilder");
 
-    if ( clusterMode_ == "DummyStubBuilder" ) {
-        _stubBuilder = new DummyStubBuilder(_conf);
-      readyToCluster_ = true;
+    if ( StubBuilderAlgo_ == "DummyStubBuilder" ) {
+      StubBuilder_ = new DummyStubBuilder(Conf_);
+      ReadyToBuild_ = true;
     } 
     else {
-      edm::LogError("SiPixelStubBuilder") << "[SiPixelStubBuilder]:"
-		<<" choice " << clusterMode_ << " is invalid.\n"
-		<< "Possible choices:\n" 
-        << "    DummyStubBuilder";
-      readyToCluster_ = false;
+      std::cout << " Choice " << StubBuilderAlgo_ << " is invalid.\n" ;
+      ReadyToBuild_ = false;
     }
+
   }
 
   //---------------------------------------------------------------------------
   //!  Iterate over DetUnits, and invoke the PixelClusterizer on each.
   //---------------------------------------------------------------------------
-  void SiPixelStubBuilder::run(const edm::DetSetVector<SiPixelCluster>   & input, 
-				   edm::ESHandle<TrackerGeometry>       & geom,
-                                   edmNew::DetSetVector<SiPixelStub> & output) {
-    if ( ! readyToCluster_ ) {
-      edm::LogError("SiPixelStubBuilder")
-		<<" at least one clusterizer is not ready -- can't run!" ;
-      // TO DO: throw an exception here?  The user may want to know...
-      return;   // clusterizer is invalid, bail out
+  void SiPixelStubBuilder::run(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,
+ 	     const TrackerGeometry& geom,
+             const TrackerTopology& topo,
+             edmNew::DetSetVector<Phase2TrackerCluster1D> output ){
+
+    if ( ! ReadyToBuild_ ) {
+      std::cout << " No stub builder algorithm was found - cannot run!" ;
+      return;
     }
 
-//     int numberOfDetUnits = 0;
-//     int numberOfClusters = 0;
-*/ 
-    // Iterate on detector units
-/*    edm::DetSetVector<PixelDigi>::const_iterator DSViter = input.begin();
-    for( ; DSViter != input.end(); DSViter++) {
-      ++numberOfDetUnits;
+    // ERICA::check::Are the Clusters Empty?
+    int numberOfDSV = 0;
+    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter;
+    for( DSViter = clusters.begin() ; DSViter != clusters.end(); DSViter++){
 
-      //  LogDebug takes very long time, get rid off.
-      //LogDebug("SiStripClusterizer") << "[SiPixelStubBuilder::run] DetID" << DSViter->id;
+      ++numberOfDSV;
+ 
+      // get the detector unit's id
+      unsigned int rawid(DSViter->detId());
+      DetId detId(rawid);
+      unsigned int layer(getLayerNumber(detId, &topo));
 
-      std::vector<short> badChannels; 
-      DetId detIdObject(DSViter->detId());
-      
-      // Comment: At the moment the clusterizer depends on geometry
-      // to access information as the pixel topology (number of columns
-      // and rows in a detector module). 
-      // In the future the geometry service will be replaced with
-      // a ES service.
-      const GeomDetUnit      * geoUnit = geom->idToDetUnit( detIdObject );
-      const PixelGeomDetUnit * pixDet  = dynamic_cast<const PixelGeomDetUnit*>(geoUnit);
-      if (! pixDet) {
-	// Fatal error!  TO DO: throw an exception!
-	assert(0);
+      std::cout << layer << std::endl;
+
+      // get the geom of the tracker
+      const GeomDetUnit* geomDetUnit(geom.idToDetUnit(detId));
+      const PixelGeomDetUnit* theGeomDet = dynamic_cast< const PixelGeomDetUnit* >(geomDetUnit);
+      const PixelTopology& topol = theGeomDet->specificTopology();
+
+      std::cout << topol.ncolumns() << std::endl;
+
+      if (!geomDetUnit) break;
+
+      // Number of clusters
+      unsigned int nClustersPixel(0), nClustersStrip(0);
+
+      // Loop over the clusters in the detector unit
+      for (edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
+
+            MeasurementPoint mpClu(clustIt->center(), clustIt->column() + 0.5);
+            Local3DPoint localPosClu = geomDetUnit->topology().localPosition(mpClu);
+            Global3DPoint globalPosClu = geomDetUnit->surface().toGlobal(localPosClu);
       }
+    }
+
+    std::cout << " ... Number of DSV in run: " << numberOfDSV << std::endl;
+
+/*
+ 
       // Produce clusters for this DetUnit and store them in 
       // a DetSet
       edmNew::DetSetVector<SiPixelCluster>::FastFiller spc(output, DSViter->detId());
@@ -204,12 +199,23 @@ namespace cms
         empty.swap(output);
         break;
       }
-    }*/ 
+    } 
 // end of DetUnit loop
     
     //LogDebug ("SiPixelStubBuilder") << " Executing " 
-    //      << clusterMode_ << " resulted in " << numberOfClusters
+    //      << StubBuilderAlgo_ << " resulted in " << numberOfClusters
     //				    << " SiPixelClusters in " << numberOfDetUnits << " DetUnits."; 
+*/
+  }
+
+  unsigned int SiPixelStubBuilder::getLayerNumber(const DetId& detid, const TrackerTopology* topo) {
+    if (detid.det() == DetId::Tracker) {
+        if (detid.subdetId() == PixelSubdetector::PixelBarrel) return (topo->pxbLayer(detid));
+        // ERICA::chech: E+ 100; E- 200 : needed?
+        else if (detid.subdetId() == PixelSubdetector::PixelEndcap) return (100 * topo->pxfSide(detid) + topo->pxfDisk(detid));
+        else return 999;
+    }
+    return 999;
   }
 
 }  // end of namespace cms

@@ -38,7 +38,7 @@ class DummyStubBuilder : public SiPixelStubBuilderBase {
  private:
 
   edm::ParameterSet conf_;
-
+/*
   //! Data storage
   SiPixelArrayBuffer               theBuffer;         // internal nrow * ncol matrix
   bool                             bufferAlreadySet;  // status of the buffer array
@@ -69,7 +69,7 @@ class DummyStubBuilder : public SiPixelStubBuilderBase {
   // Calibrate the ADC charge to electrons 
   int   theStackADC_;          // The maximum ADC count for the stack layers
   int   theFirstStack_;        // The index of the first stack layer
-
+*/
 
 };
 

@@ -28,8 +28,9 @@ using namespace std;
 //----------------------------------------------------------------------------
 DummyStubBuilder::DummyStubBuilder
   (edm::ParameterSet const& conf) :
-    conf_(conf), bufferAlreadySet(false), theNumOfRows(0), theNumOfCols(0), detid_(0) 
+    conf_(conf)//, bufferAlreadySet(false), theNumOfRows(0), theNumOfCols(0), detid_(0) 
 {
+/*
   // Get thresholds in electrons
   thePixelThreshold   = 
     conf_.getParameter<int>("ChannelThreshold");
@@ -52,10 +53,11 @@ DummyStubBuilder::DummyStubBuilder
   doMissCalibrate=conf_.getUntrackedParameter<bool>("MissCalibrate",true); 
   doSplitClusters = conf.getParameter<bool>("SplitClusters");
   theBuffer.setSize( theNumOfRows, theNumOfCols );
+*/
 }
 /////////////////////////////////////////////////////////////////////////////
 DummyStubBuilder::~DummyStubBuilder() {}
-
+/*
 //----------------------------------------------------------------------------
 //!  Prepare the Clusterizer to work on a particular DetUnit.  Re-init the
 //!  size of the panel/plaquette (so update nrows and ncols), 
@@ -93,6 +95,7 @@ bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet)
 //!  and finds the largest contiguous cluster around
 //!  each seed pixel.
 //!  Input and output data stored in DetSet
+*/
 //----------------------------------------------------------------------------
 void DummyStubBuilder::buildDetUnit( const edm::DetSet<SiPixelCluster> & input, 
                                      const PixelGeomDetUnit * pixDet,
