@@ -52,10 +52,15 @@ namespace cms
 
     // Begin Job
     //virtual void beginJob( const edm::EventSetup& );
-    virtual void beginJob( );
+    virtual void beginJob();
 
     //--- The top-level event method.
     virtual void produce(edm::Event&, const edm::EventSetup& );
+
+    //--- Check input clusters
+    void check(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,
+               const TrackerGeometry& geom,
+               const TrackerTopology& topo);
 
     //--- Execute the algorithm(s).
     void run(const edmNew::DetSetVector<Phase2TrackerCluster1D>& ,
@@ -64,10 +69,10 @@ namespace cms
              edmNew::DetSetVector<Phase2TrackerCluster1D> );
 
     //--- Get the layer && module given the geometry
-    unsigned int getLayerNumber(const DetId& , 
-		 	        const TrackerTopology* );
-    unsigned int getModuleNumber(const DetId& , 
-		 	         const TrackerTopology* );
+    //unsigned int getLayerNumber(const DetId& , 
+    //		 	        const TrackerTopology* );
+    //unsigned int getModuleNumber(const DetId& , 
+    //		 	         const TrackerTopology* );
 
   private:
 

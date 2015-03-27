@@ -10,6 +10,7 @@
 #include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelArrayBuffer.h"
 #include "CondFormats/SiPixelObjects/interface/SiPixelGainCalibrationOffline.h"
 // Geometry
+#include "Geometry/CommonDetUnit/interface/GeomDetUnit.h"
 #include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
 #include "Geometry/CommonTopologies/interface/PixelTopology.h"
 //#include "Geometry/CommonTopologies/RectangularPixelTopology.h"
@@ -97,31 +98,74 @@ bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet)
 //!  Input and output data stored in DetSet
 */
 //----------------------------------------------------------------------------
-std::vector< std::pair< int, std::vector<Phase2TrackerCluster1D> > > DummyStubBuilder::groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters, const TrackerTopology& topo){
+// ERICA::FIXME why here, and just here, I have an error if I put StackClusters????
+std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > DummyStubBuilder::groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters, const TrackerGeometry& geom, const TrackerTopology& topo ){
 
   if(clusters.empty())
-    return std::vector< std::pair< int, vector<Phase2TrackerCluster1D> > >(); 
+    return std::vector< StackClusters >(); 
 
-  std::vector< std::pair< int, vector<Phase2TrackerCluster1D> > > result;
+  std::vector< StackClusters > result;
   result.reserve( clusters.size() );
 
-  int numberOfDSV = 0;
   edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter;
   for( DSViter = clusters.begin() ; DSViter != clusters.end(); DSViter++){
-    ++numberOfDSV;
+
+    vector<Phase2TrackerCluster1D> clustersInStack;
+
     // get the detector unit's id
     unsigned int rawid(DSViter->detId());
     DetId detId(rawid);
     unsigned int layer(getLayerNumber(detId, &topo));
-    unsigned int module(getModuleNumber(detId, &topo));
-    std::cout << rawid << std::endl;
-    std::cout << layer << std::endl;
-    std::cout << module << std::endl;
-//      if(module%2 == 0){
+    unsigned int InnerModule(getModuleNumber(detId, &topo));
+
+    // if the module is odd (inner), I will search for the +1 (outer)
+    if(InnerModule%2 != 0){
+
+      std::cout << "This module is odd(" << InnerModule << "):: check if exists the +1" << std::endl;
+      edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter2;
+      for( DSViter2 = DSViter+1 ; DSViter2 != clusters.end(); DSViter2++){
+
+        unsigned int rawid2(DSViter2->detId());
+        DetId detId2(rawid2);
+        unsigned int layer2(getLayerNumber(detId2, &topo));
+        unsigned int OuterModule(getModuleNumber(detId2, &topo));
+    
+        //exclude if are the same, or with different layer
+        if(rawid == rawid2) continue;
+        if(layer != layer2) continue;
+        if(OuterModule == InnerModule+1) {
+          std::cout << "\t Module exists!" << std::endl;
+          std::cout << "\t Stack created with DetIds: " << rawid << "," << rawid2 << std::endl;
+
+          //creation of the stack: the plane is the inner one
+          const GeomDetUnit* geomDetUnit(geom.idToDetUnit(detId));
+          const GeomDetUnit* geomDetUnit2(geom.idToDetUnit(detId2));
+          if (!geomDetUnit || !geomDetUnit2) break;
+          const PixelGeomDetUnit* theGeomDet = dynamic_cast< const PixelGeomDetUnit* >(geomDetUnit); 
+          Plane* sf = new Plane(theGeomDet->surface());
+
+	  StackGeomDet stack = StackGeomDet(sf,geomDetUnit,geomDetUnit2);
+
+          //run on both DSV to find all the clusters associated to the Stack
+          edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt;
+          for ( clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
+            clustersInStack.push_back(*clustIt);
+          }
+          for ( clustIt = DSViter2->begin(); clustIt != DSViter2->end(); ++clustIt) {
+            clustersInStack.push_back(*clustIt);
+          }
+          std::cout << "\t with " << clustersInStack.size() << " clusters associated." << std::endl;
+          result.push_back(make_pair(stack,clustersInStack));
+          break;
+        }
+      }
+
+    }
+
 
   }
 
-  std::cout << " ... Number of DSV in run: " << numberOfDSV << std::endl;
+  std::cout << " ... Number of Stack created: " << result.size() << std::endl;
   return result;
 }
 

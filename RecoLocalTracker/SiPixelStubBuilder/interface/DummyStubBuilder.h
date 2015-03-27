@@ -16,6 +16,9 @@
 
 // The private pixel buffer
 #include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelArrayBuffer.h"
+#include "Geometry/CommonDetUnit/interface/GeomDetUnit.h"
+#include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
+#include "Geometry/CommonTopologies/interface/PixelTopology.h"
 
 // Parameter Set:
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -31,7 +34,7 @@ class DummyStubBuilder : public SiPixelStubBuilderBase {
   ~DummyStubBuilder();
 
   // group clusters in stack modules
-  std::vector< std::pair< int, std::vector<Phase2TrackerCluster1D> > > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,const TrackerTopology& topo);
+  std::vector< StackClusters > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,const TrackerGeometry& geom, const TrackerTopology& topo);
 
   // Full I/O in DetSet
   void buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input, 

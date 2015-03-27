@@ -93,18 +93,21 @@ namespace cms
     eventSetup.get< IdealGeometryRecord >().get(tTopoHandle);
     const TrackerTopology* tkTopo = tTopoHandle.product();
 
+    // check on the input clusters
+    check( *ClustersHandle, *tkGeom, *tkTopo);
+
     // running the stub building algorithm
     run( *ClustersHandle, *tkGeom, *tkTopo, *outputClusterAccept);//, *outputStubsAccepted, *outputStubsRejected );
 
     // ERICA::check::Are the output clusters empty?
-    *outputClusterAccept = *ClustersHandle;
-    int numberOfDetUnits_produced = 0;
-    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator ClusterIter_new;
-    for( ClusterIter_new = (*outputClusterAccept).begin() ; ClusterIter_new != (*outputClusterAccept).end(); ClusterIter_new++) {
-      ++numberOfDetUnits_produced;
-    }
+   // *outputClusterAccept = *ClustersHandle;
+   // int numberOfDetUnits_produced = 0;
+   // edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator ClusterIter_new;
+   // for( ClusterIter_new = (*outputClusterAccept).begin() ; ClusterIter_new != (*outputClusterAccept).end(); ClusterIter_new++) {
+   //   ++numberOfDetUnits_produced;
+   // }
 
-    std::cout << " ... Number of clusters produced: " << numberOfDetUnits_produced << std::endl;
+   // std::cout << " ... Number of clusters produced: " << numberOfDetUnits_produced << std::endl;
 
     // write output to file
     event.put( outputClusterAccept, "ClusterAccepted" );
@@ -133,8 +136,6 @@ namespace cms
   }
 
   //---------------------------------------------------------------------------
-  //!  Iterate over DetUnits, and invoke the PixelClusterizer on each.
-  //---------------------------------------------------------------------------
   void SiPixelStubBuilder::run(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,
  	     const TrackerGeometry& geom,
              const TrackerTopology& topo,
@@ -145,40 +146,8 @@ namespace cms
       return;
     }
 
-    std::vector< std::pair< int, std::vector<Phase2TrackerCluster1D> > > groupClusterBySM;    
-    groupClusterBySM = StubBuilder_->groupinginStackModules(clusters, topo);
-
-
-    // ERICA::check::Are the Clusters Empty?
-    int numberOfDS = 0;
-//    int numberOfStubs = 0;
-    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter;
-    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter2;
-    for( DSViter = clusters.begin() ; DSViter != clusters.end(); DSViter++){
-
- 
-      // get the detector unit's id
-      unsigned int rawid(DSViter->detId());
-      DetId detId(rawid);
-      //unsigned int layer(getLayerNumber(detId, &topo));
-      //unsigned int module(getModuleNumber(detId, &topo));
-
-      
-      // get the geom of the tracker
-      const GeomDetUnit* geomDetUnit(geom.idToDetUnit(detId));
-      const PixelGeomDetUnit* theGeomDet = dynamic_cast< const PixelGeomDetUnit* >(geomDetUnit);
-      const PixelTopology& topol = theGeomDet->specificTopology();
-
-      if(topol.ncolumns() == 32) std::cout << "Pixel module!" << std::endl;
-      else if(topol.ncolumns() == 2 ) std::cout << "Strip module!" << std::endl;
-      else std::cout << "no module?!" << std::endl;
-
-      if (!geomDetUnit) break;
-
-
-
-
-
+    std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > groupClusterBySM;    
+    groupClusterBySM = StubBuilder_->groupinginStackModules(clusters, geom, topo);
 
 /*
       // Produce stubs for this DetUnit and store them in a DetSetVector
@@ -190,27 +159,6 @@ namespace cms
 	numberOfClusters += spc.size();
       }
 */
-      // Number of clusters
-      //unsigned int nClustersPixel(0), nClustersStrip(0);
-
-      // Loop over the clusters in the detector unit
-      for (edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
-
-        numberOfDS++;
-
-        MeasurementPoint mpClu(clustIt->center(), clustIt->column() + 0.5);
-        Local3DPoint localPosClu = geomDetUnit->topology().localPosition(mpClu);
-        Global3DPoint globalPosClu = geomDetUnit->surface().toGlobal(localPosClu);
-
-      //  std::cout << "Cluster #" << numberOfDS << " in DetSet#" << numberOfDSV << std::endl;
-        std::cout << "\t local  pos " << localPosClu << std::endl;
-        std::cout << "\t global pos " << globalPosClu << std::endl;
-
-      }
-      std::cout << std::endl;
-    }
-
-    std::cout << " ... Number of DS in run: " << numberOfDS << std::endl;
 
 /*
  
@@ -230,7 +178,56 @@ namespace cms
 */
   }
 
-  unsigned int SiPixelStubBuilder::getLayerNumber(const DetId& detid, const TrackerTopology* topo) {
+  //---------------------------------------------------------------------------
+  void SiPixelStubBuilder::check(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,
+             const TrackerGeometry& geom,
+             const TrackerTopology& topo){
+  
+    int nCluster = 0;
+    int numberOfDSV = 0;
+    edmNew::DetSetVector<Phase2TrackerCluster1D>::const_iterator DSViter;
+    for( DSViter = clusters.begin() ; DSViter != clusters.end(); DSViter++){
+
+      ++numberOfDSV;
+
+      // get the detector unit's id
+      unsigned int rawid(DSViter->detId());
+      DetId detId(rawid);
+      unsigned int layer(StubBuilder_->getLayerNumber(detId, &topo));
+      unsigned int module(StubBuilder_->getModuleNumber(detId, &topo));
+      
+      // get the geom of the tracker
+      const GeomDetUnit* geomDetUnit(geom.idToDetUnit(detId));
+      const PixelGeomDetUnit* theGeomDet = dynamic_cast< const PixelGeomDetUnit* >(geomDetUnit);
+      const PixelTopology& topol = theGeomDet->specificTopology();
+
+      std::cout << "Layer:" << layer << std::endl;
+      if(topol.ncolumns() == 32) std::cout << "Pixel cluster with detId:" << rawid << "(module:" << module
+					   << ") in DetSet#" << numberOfDSV << std::endl;
+      else if(topol.ncolumns() == 2 ) std::cout << "Strip cluster with detId " << rawid << "(module:" << module
+					   << ") in DetSet#" << numberOfDSV << std::endl;
+      else std::cout << "no module?!" << std::endl;
+
+      if (!geomDetUnit) break;
+
+      // Loop over the clusters in the detector unit
+      for (edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
+
+        nCluster++;
+
+        MeasurementPoint mpClu(clustIt->center(), clustIt->column() + 0.5);
+        Local3DPoint localPosClu = geomDetUnit->topology().localPosition(mpClu);
+        Global3DPoint globalPosClu = geomDetUnit->surface().toGlobal(localPosClu);
+
+        std::cout << "\t local  pos " << localPosClu << std::endl;
+        std::cout << "\t global pos " << globalPosClu << std::endl;
+
+      }
+    }
+    std::cout << " Number of input clusters: " << nCluster << std::endl;
+
+  }
+/*  unsigned int SiPixelStubBuilder::getLayerNumber(const DetId& detid, const TrackerTopology* topo) {
     if (detid.det() == DetId::Tracker) {
         if (detid.subdetId() == PixelSubdetector::PixelBarrel) {
           return (topo->pxbLayer(detid));
@@ -257,5 +254,5 @@ namespace cms
     }
     return 999;
   }
-
+*/
 }  // end of namespace cms
