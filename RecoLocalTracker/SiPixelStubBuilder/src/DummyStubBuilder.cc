@@ -90,12 +90,6 @@ bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet)
   
   return true;   
 }
-//----------------------------------------------------------------------------
-//!  \brief Cluster pixels.
-//!  This method operates on a matrix of pixels
-//!  and finds the largest contiguous cluster around
-//!  each seed pixel.
-//!  Input and output data stored in DetSet
 */
 //----------------------------------------------------------------------------
 // ERICA::FIXME why here, and just here, I have an error if I put StackClusters????
@@ -119,6 +113,7 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Du
     unsigned int InnerModule(getModuleNumber(detId, &topo));
 
     // if the module is odd (inner), I will search for the +1 (outer)
+    // if the clusters are just in one detector a STACK is not created.
     if(InnerModule%2 != 0){
 
       std::cout << "This module is odd(" << InnerModule << "):: check if exists the +1" << std::endl;
@@ -155,6 +150,9 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Du
             clustersInStack.push_back(*clustIt);
           }
           std::cout << "\t with " << clustersInStack.size() << " clusters associated." << std::endl;
+
+//	  buildVectorHits();
+
           result.push_back(make_pair(stack,clustersInStack));
           break;
         }
