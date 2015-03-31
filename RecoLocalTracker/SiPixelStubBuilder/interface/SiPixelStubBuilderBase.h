@@ -25,7 +25,7 @@ public:
   virtual ~SiPixelStubBuilderBase() {}
 
   // grouping clusters
-  virtual std::vector< StackClusters > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters, const TrackerGeometry& geom, const TrackerTopology& topo) = 0;
+  virtual std::vector< StackClusters > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters) = 0;
 
   // Build stubs in a DetUnit
   virtual void buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input,	

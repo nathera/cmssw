@@ -1,12 +1,12 @@
 //----------------------------------------------------------------------------
-//! \class DummyStubBuilder
+//! \class VectorHitBuilder
 //! \brief A specific threshold-based pixel clustering algorithm
 //!
 
 //----------------------------------------------------------------------------
 
 // Our own includes
-#include "RecoLocalTracker/SiPixelStubBuilder/interface/DummyStubBuilder.h"
+#include "RecoLocalTracker/SiPixelStubBuilder/interface/VectorHitBuilder.h"
 #include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelArrayBuffer.h"
 #include "CondFormats/SiPixelObjects/interface/SiPixelGainCalibrationOffline.h"
 // Geometry
@@ -27,9 +27,9 @@ using namespace std;
 //!  Initilize the buffer to hold pixels from a detector module.
 //!  This is a vector of 44k ints, stays valid all the time.  
 //----------------------------------------------------------------------------
-DummyStubBuilder::DummyStubBuilder
-  (edm::ParameterSet const& conf) :
-    conf_(conf)//, bufferAlreadySet(false), theNumOfRows(0), theNumOfCols(0), detid_(0) 
+VectorHitBuilder::VectorHitBuilder
+  (edm::ParameterSet const& conf, const TrackerGeometry& geom, const TrackerTopology& topo) :
+    conf_(conf), theTkGeom(geom), theTkTopo(topo)// theNumOfCols(0), detid_(0) 
 {
 /*
   // Get thresholds in electrons
@@ -57,13 +57,13 @@ DummyStubBuilder::DummyStubBuilder
 */
 }
 /////////////////////////////////////////////////////////////////////////////
-DummyStubBuilder::~DummyStubBuilder() {}
+VectorHitBuilder::~VectorHitBuilder() {}
 /*
 //----------------------------------------------------------------------------
 //!  Prepare the Clusterizer to work on a particular DetUnit.  Re-init the
 //!  size of the panel/plaquette (so update nrows and ncols), 
 //----------------------------------------------------------------------------
-bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet) 
+bool VectorHitBuilder::setup(const PixelGeomDetUnit * pixDet) 
 {
   // Cache the topology.
   const PixelTopology & topol = pixDet->specificTopology();
@@ -79,7 +79,7 @@ bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet)
        ncols > theBuffer.columns() ) 
     { // change only when a larger is needed
       //if( nrows != theNumOfRows || ncols != theNumOfCols ) {
-      //cout << " DummyStubBuilder: pixel buffer redefined to " 
+      //cout << " VectorHitBuilder: pixel buffer redefined to " 
       // << nrows << " * " << ncols << endl;      
       //theNumOfRows = nrows;  // Set new sizes
       //theNumOfCols = ncols;
@@ -93,7 +93,7 @@ bool DummyStubBuilder::setup(const PixelGeomDetUnit * pixDet)
 */
 //----------------------------------------------------------------------------
 // ERICA::FIXME why here, and just here, I have an error if I put StackClusters????
-std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > DummyStubBuilder::groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters, const TrackerGeometry& geom, const TrackerTopology& topo ){
+std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > VectorHitBuilder::groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters ){
 
   if(clusters.empty())
     return std::vector< StackClusters >(); 
@@ -105,12 +105,14 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Du
   for( DSViter = clusters.begin() ; DSViter != clusters.end(); DSViter++){
 
     vector<Phase2TrackerCluster1D> clustersInStack;
+    vector<Phase2TrackerCluster1D> innerClustersInStack;
+    vector<Phase2TrackerCluster1D> outerClustersInStack;
 
     // get the detector unit's id
     unsigned int rawid(DSViter->detId());
     DetId detId(rawid);
-    unsigned int layer(getLayerNumber(detId, &topo));
-    unsigned int InnerModule(getModuleNumber(detId, &topo));
+    unsigned int layer(getLayerNumber(detId, &theTkTopo));
+    unsigned int InnerModule(getModuleNumber(detId, &theTkTopo));
 
     // if the module is odd (inner), I will search for the +1 (outer)
     // if the clusters are just in one detector a STACK is not created.
@@ -122,8 +124,8 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Du
 
         unsigned int rawid2(DSViter2->detId());
         DetId detId2(rawid2);
-        unsigned int layer2(getLayerNumber(detId2, &topo));
-        unsigned int OuterModule(getModuleNumber(detId2, &topo));
+        unsigned int layer2(getLayerNumber(detId2, &theTkTopo));
+        unsigned int OuterModule(getModuleNumber(detId2, &theTkTopo));
     
         //exclude if are the same, or with different layer
         if(rawid == rawid2) continue;
@@ -133,8 +135,8 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Du
           std::cout << "\t Stack created with DetIds: " << rawid << "," << rawid2 << std::endl;
 
           //creation of the stack: the plane is the inner one
-          const GeomDetUnit* geomDetUnit(geom.idToDetUnit(detId));
-          const GeomDetUnit* geomDetUnit2(geom.idToDetUnit(detId2));
+          const GeomDetUnit* geomDetUnit(theTkGeom.idToDetUnit(detId));
+          const GeomDetUnit* geomDetUnit2(theTkGeom.idToDetUnit(detId2));
           if (!geomDetUnit || !geomDetUnit2) break;
           const PixelGeomDetUnit* theGeomDet = dynamic_cast< const PixelGeomDetUnit* >(geomDetUnit); 
           Plane* sf = new Plane(theGeomDet->surface());
@@ -144,14 +146,16 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Du
           //run on both DSV to find all the clusters associated to the Stack
           edmNew::DetSet< Phase2TrackerCluster1D >::const_iterator clustIt;
           for ( clustIt = DSViter->begin(); clustIt != DSViter->end(); ++clustIt) {
+            innerClustersInStack.push_back(*clustIt);
             clustersInStack.push_back(*clustIt);
           }
           for ( clustIt = DSViter2->begin(); clustIt != DSViter2->end(); ++clustIt) {
+            outerClustersInStack.push_back(*clustIt);
             clustersInStack.push_back(*clustIt);
           }
           std::cout << "\t with " << clustersInStack.size() << " clusters associated." << std::endl;
 
-//	  buildVectorHits();
+          std::vector<VectorHit> vhInStack = buildVectorHits(innerClustersInStack,outerClustersInStack);  
 
           result.push_back(make_pair(stack,clustersInStack));
           break;
@@ -168,7 +172,20 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Du
 }
 
 //----------------------------------------------------------------------------
-void DummyStubBuilder::buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input, 
+std::vector<VectorHit> VectorHitBuilder::buildVectorHits(std::vector<Phase2TrackerCluster1D> innerClus, std::vector<Phase2TrackerCluster1D> outerClus){
+
+  std::vector<VectorHit> result;
+  std::vector<Phase2TrackerCluster1D>::const_iterator innerClus_iter;
+  for( innerClus_iter = innerClus.begin(); innerClus_iter != innerClus.end(); innerClus_iter++ ){
+
+  }
+
+  return result;
+
+}
+
+//----------------------------------------------------------------------------
+void VectorHitBuilder::buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input, 
                                      output_t& output)  {
   
   buildDetUnit_(input, output);  

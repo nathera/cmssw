@@ -1,40 +1,36 @@
-#ifndef RecoLocalTracker_SiStubBuilder_DummyStubBuilder_H
-#define RecoLocalTracker_SiStubBuilder_DummyStubBuilder_H
+#ifndef RecoLocalTracker_SiStubBuilder_VectorHitBuilder_H
+#define RecoLocalTracker_SiStubBuilder_VectorHitBuilder_H
 
 //-----------------------------------------------------------------------
-//! \class DummyStubBuilder
+//! \class VectorHitBuilder
 //! \brief An dummy stub building algorithm
 //!
 
 //-----------------------------------------------------------------------
 
-// Base class, defines SiPixelDigi and SiPixelCluster.  The latter includes
-// Pixel, PixelPos and Shift as inner classes.
-//
-#include "DataFormats/Common/interface/DetSetVector.h"
-#include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelStubBuilderBase.h"
-
-// The private pixel buffer
-#include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelArrayBuffer.h"
+#include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
+#include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
 #include "Geometry/CommonDetUnit/interface/GeomDetUnit.h"
-#include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
-#include "Geometry/CommonTopologies/interface/PixelTopology.h"
 
-// Parameter Set:
+#include "DataFormats/Common/interface/DetSetVector.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+#include "RecoLocalTracker/SiPixelStubBuilder/interface/SiPixelStubBuilderBase.h"
+#include "DataFormats/TrackingRecHit/interface/VectorHit.h"
 
 #include <vector>
 #include <map>
 
 
-class DummyStubBuilder : public SiPixelStubBuilderBase {
+class VectorHitBuilder : public SiPixelStubBuilderBase {
  public:
 
-  DummyStubBuilder(edm::ParameterSet const& conf);
-  ~DummyStubBuilder();
+  VectorHitBuilder(edm::ParameterSet const& conf, const TrackerGeometry& geom, const TrackerTopology& topo);
+  ~VectorHitBuilder();
 
   // group clusters in stack modules
-  std::vector< StackClusters > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters,const TrackerGeometry& geom, const TrackerTopology& topo);
+  std::vector< StackClusters > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters);
+  std::vector<VectorHit> buildVectorHits(std::vector<Phase2TrackerCluster1D> innerClus, std::vector<Phase2TrackerCluster1D> outerClus);
 
   // Full I/O in DetSet
   void buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input, 
@@ -44,6 +40,9 @@ class DummyStubBuilder : public SiPixelStubBuilderBase {
 
   
  private:
+  edm::ParameterSet conf_;
+  const TrackerGeometry& theTkGeom;
+  const TrackerTopology& theTkTopo;
 
 
  template<class T> void buildDetUnit_(const T& input, output_t& output) {
@@ -54,7 +53,6 @@ class DummyStubBuilder : public SiPixelStubBuilderBase {
    }   
  }
 
-  edm::ParameterSet conf_;
 /*
   //! Data storage
   SiPixelArrayBuffer               theBuffer;         // internal nrow * ncol matrix

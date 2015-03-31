@@ -6,7 +6,7 @@
 
 // Our own stuff
 #include "RecoLocalTracker/SiPixelStubBuilder/plugins/SiPixelStubBuilder.h"
-#include "RecoLocalTracker/SiPixelStubBuilder/interface/DummyStubBuilder.h"
+#include "RecoLocalTracker/SiPixelStubBuilder/interface/VectorHitBuilder.h"
 
 // Geometry
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
@@ -47,13 +47,11 @@ namespace cms
 //    maxTotalClusters_( conf.getParameter<int32_t>( "maxNumberOfClusters" ) )
   {
     //--- Declare to the EDM what kind of collections we will be making.
+    // FIXME::put VectorHitsCollection instead of SiPixelStubCollectionNew
     produces< edmNew::DetSetVector< Phase2TrackerCluster1D > >( "ClusterAccepted" );
-    produces< SiPixelStubCollectionNew >( "StubAccepted" );
-    produces< SiPixelStubCollectionNew >( "StubRejected" );
+    produces< SiPixelStubCollectionNew >( "VectorHitsAccepted" );
+    produces< SiPixelStubCollectionNew >( "VectorHitsRejected" );
 
-    //--- Make the algorithm(s) according to what the user specified
-    //--- in the ParameterSet.
-    setupStubFindingAlgorithm();
 
   }
 
@@ -81,8 +79,8 @@ namespace cms
 
     // create the final output collection
     std::auto_ptr< edmNew::DetSetVector< Phase2TrackerCluster1D > > outputClusterAccept( new edmNew::DetSetVector< Phase2TrackerCluster1D > );
-    std::auto_ptr< SiPixelStubCollectionNew > outputStubsAccepted( new SiPixelStubCollectionNew() );
-    std::auto_ptr< SiPixelStubCollectionNew > outputStubsRejected( new SiPixelStubCollectionNew() );
+    std::auto_ptr< SiPixelStubCollectionNew > outputVHAccepted( new SiPixelStubCollectionNew() );
+    std::auto_ptr< SiPixelStubCollectionNew > outputVHRejected( new SiPixelStubCollectionNew() );
 
     // get the geometry
     edm::ESHandle< TrackerGeometry > geomHandle;
@@ -92,6 +90,9 @@ namespace cms
     edm::ESHandle< TrackerTopology > tTopoHandle;
     eventSetup.get< IdealGeometryRecord >().get(tTopoHandle);
     const TrackerTopology* tkTopo = tTopoHandle.product();
+
+    // check on the input clusters
+    setupStubFindingAlgorithm(*tkGeom, *tkTopo);
 
     // check on the input clusters
     check( *ClustersHandle, *tkGeom, *tkTopo);
@@ -111,8 +112,8 @@ namespace cms
 
     // write output to file
     event.put( outputClusterAccept, "ClusterAccepted" );
-    event.put( outputStubsAccepted, "StubAccepted" );
-    event.put( outputStubsRejected, "StubRejected" );
+    event.put( outputVHAccepted, "VectorHitsAccepted" );
+    event.put( outputVHRejected, "VectorHitsRejected" );
 
     std::cout << "SiPixelStubBuilder::produce() end" << std::endl;
 
@@ -121,11 +122,12 @@ namespace cms
   //---------------------------------------------------------------------------
   //  Set up the specific algorithm we are going to use.  
   //---------------------------------------------------------------------------
-  void SiPixelStubBuilder::setupStubFindingAlgorithm()  {
-    StubBuilderAlgo_ = Conf_.getUntrackedParameter<std::string>("AlgorithmName","DummyStubBuilder");
+  void SiPixelStubBuilder::setupStubFindingAlgorithm( const TrackerGeometry& geom,
+             const TrackerTopology& topo )  {
+    StubBuilderAlgo_ = Conf_.getUntrackedParameter<std::string>("AlgorithmName","VectorHitBuilder");
 
-    if ( StubBuilderAlgo_ == "DummyStubBuilder" ) {
-      StubBuilder_ = new DummyStubBuilder(Conf_);
+    if ( StubBuilderAlgo_ == "VectorHitBuilder" ) {
+      StubBuilder_ = new VectorHitBuilder(Conf_, geom, topo);
       ReadyToBuild_ = true;
     } 
     else {
@@ -147,7 +149,7 @@ namespace cms
     }
 
     std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > groupClusterBySM;    
-    groupClusterBySM = StubBuilder_->groupinginStackModules(clusters, geom, topo);
+    groupClusterBySM = StubBuilder_->groupinginStackModules(clusters);
 
 /*
       // Produce stubs for this DetUnit and store them in a DetSetVector

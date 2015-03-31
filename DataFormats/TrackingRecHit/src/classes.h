@@ -5,6 +5,7 @@
 #include "DataFormats/GeometryVector/interface/LocalPoint.h" 
 #include "DataFormats/TrackingRecHit/interface/InvalidTrackingRecHit.h"
 #include "DataFormats/TrackingRecHit/interface/RecSegment.h"
+#include "DataFormats/TrackingRecHit/interface/VectorHit.h"
 #include "DataFormats/Common/interface/Wrapper.h"
 
 namespace {
@@ -24,5 +25,9 @@ namespace {
                              edm::ClonePolicy<TrackingRecHit> >::const_iterator> pr1;    
     std::auto_ptr<TrackingRecHitRef> ap1;
     edm::Wrapper<TrackingRecHitCollection> w1;
+    
+//    std::vector<VectorHit> vh1;
+//    edm::Wrapper<VectorHitCollection> wh1;
+//    edm::Wrapper<VectorHitCollectionNew> wh1_new;    
   };
 }

@@ -48,7 +48,7 @@ namespace cms
     explicit SiPixelStubBuilder(const edm::ParameterSet& );
     virtual ~SiPixelStubBuilder();
 
-    void setupStubFindingAlgorithm();
+    void setupStubFindingAlgorithm(const TrackerGeometry& geom, const TrackerTopology& topo);
 
     // Begin Job
     //virtual void beginJob( const edm::EventSetup& );
