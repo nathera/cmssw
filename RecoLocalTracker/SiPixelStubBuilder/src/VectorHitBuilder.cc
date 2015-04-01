@@ -155,7 +155,8 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Ve
           }
           std::cout << "\t with " << clustersInStack.size() << " clusters associated." << std::endl;
 
-          std::vector<VectorHit> vhInStack = buildVectorHits(innerClustersInStack,outerClustersInStack);  
+	  //ERICA::check if creating the VH here or somewhere else
+          std::vector<VectorHit> vhInStack = buildVectorHits(stack,innerClustersInStack,outerClustersInStack);  
 
           result.push_back(make_pair(stack,clustersInStack));
           break;
@@ -172,11 +173,39 @@ std::vector< std::pair< StackGeomDet, std::vector<Phase2TrackerCluster1D> > > Ve
 }
 
 //----------------------------------------------------------------------------
-std::vector<VectorHit> VectorHitBuilder::buildVectorHits(std::vector<Phase2TrackerCluster1D> innerClus, std::vector<Phase2TrackerCluster1D> outerClus){
+//ERICA::in the DT code the global position is used to compute the alpha angle and put a cut on that.
+//Here 
+std::vector<VectorHit> VectorHitBuilder::buildVectorHits(StackGeomDet stack, std::vector<Phase2TrackerCluster1D> innerClus, std::vector<Phase2TrackerCluster1D> outerClus){
 
   std::vector<VectorHit> result;
   std::vector<Phase2TrackerCluster1D>::const_iterator innerClus_iter;
+  const GeomDetUnit* gDUnitInn = stack.innerDet();
+  const GeomDetUnit* gDUnitOut = stack.outerDet();
   for( innerClus_iter = innerClus.begin(); innerClus_iter != innerClus.end(); innerClus_iter++ ){
+  
+    MeasurementPoint mpCluInn(innerClus_iter->center(), innerClus_iter->column() + 0.5);
+    Local3DPoint localPosCluInn = gDUnitInn->topology().localPosition(mpCluInn);
+    Global3DPoint globalPosCluInn = gDUnitInn->surface().toGlobal(localPosCluInn);
+
+    std::vector<Phase2TrackerCluster1D>::const_iterator outerClus_iter;
+    for( outerClus_iter = outerClus.begin(); outerClus_iter != outerClus.end(); outerClus_iter++ ){
+
+      MeasurementPoint mpCluOut(outerClus_iter->center(), outerClus_iter->column() + 0.5);
+      Local3DPoint localPosCluOut = gDUnitOut->topology().localPosition(mpCluOut);
+      Global3DPoint globalPosCluOut = gDUnitOut->surface().toGlobal(localPosCluOut);
+
+      
+      Global3DVector globalVec = globalPosCluOut - globalPosCluInn;
+      Local3DVector localVec = localPosCluOut - localPosCluInn;
+
+      std::cout << "\t inner global pos " << globalPosCluInn << std::endl;
+      std::cout << "\t outer global pos " << globalPosCluOut << std::endl;
+      std::cout << "\t global vec " << globalVec << std::endl;
+
+      std::cout << "\t inner local pos " << localPosCluInn << std::endl;
+      std::cout << "\t outer local pos " << localPosCluOut << std::endl;
+      std::cout << "\t local vec " << localVec << std::endl;
+    }
 
   }
 

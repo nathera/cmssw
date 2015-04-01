@@ -30,7 +30,9 @@ class VectorHitBuilder : public SiPixelStubBuilderBase {
 
   // group clusters in stack modules
   std::vector< StackClusters > groupinginStackModules(const edmNew::DetSetVector<Phase2TrackerCluster1D>& clusters);
-  std::vector<VectorHit> buildVectorHits(std::vector<Phase2TrackerCluster1D> innerClus, std::vector<Phase2TrackerCluster1D> outerClus);
+  std::vector<VectorHit> buildVectorHits(StackGeomDet stack, 
+                                         std::vector<Phase2TrackerCluster1D> innerClus, 
+                                         std::vector<Phase2TrackerCluster1D> outerClus);
 
   // Full I/O in DetSet
   void buildDetUnit( const edm::DetSetVector<Phase2TrackerCluster1D> & input, 
