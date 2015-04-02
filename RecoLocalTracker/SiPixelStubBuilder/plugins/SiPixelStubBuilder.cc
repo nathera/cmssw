@@ -49,8 +49,8 @@ namespace cms
     //--- Declare to the EDM what kind of collections we will be making.
     // FIXME::put VectorHitsCollection instead of SiPixelStubCollectionNew
     produces< edmNew::DetSetVector< Phase2TrackerCluster1D > >( "ClusterAccepted" );
-    produces< SiPixelStubCollectionNew >( "VectorHitsAccepted" );
-    produces< SiPixelStubCollectionNew >( "VectorHitsRejected" );
+    produces< VectorHitCollectionNew >( "VectorHitsAccepted" );
+    produces< VectorHitCollectionNew >( "VectorHitsRejected" );
 
 
   }
@@ -79,8 +79,8 @@ namespace cms
 
     // create the final output collection
     std::auto_ptr< edmNew::DetSetVector< Phase2TrackerCluster1D > > outputClusterAccept( new edmNew::DetSetVector< Phase2TrackerCluster1D > );
-    std::auto_ptr< SiPixelStubCollectionNew > outputVHAccepted( new SiPixelStubCollectionNew() );
-    std::auto_ptr< SiPixelStubCollectionNew > outputVHRejected( new SiPixelStubCollectionNew() );
+    std::auto_ptr< VectorHitCollectionNew > outputVHAccepted( new VectorHitCollectionNew() );
+    std::auto_ptr< VectorHitCollectionNew > outputVHRejected( new VectorHitCollectionNew() );
 
     // get the geometry
     edm::ESHandle< TrackerGeometry > geomHandle;
