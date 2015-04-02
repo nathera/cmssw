@@ -25,8 +25,9 @@
 class VectorHit : public RecSegment {
  public:
 
-  /// Empty constructor 
   VectorHit() : thePosition(), theDirection(), theCovMatrix(), theDimension(0) { std::cout << "qui ci faccio un bel Vector Hit!!" << std::endl;}
+  VectorHit(const LocalPoint& posInner, const LocalVector& dir) ;
+
   ~VectorHit() ;
   virtual VectorHit* clone() const { return new VectorHit(*this);}
 
@@ -151,15 +152,15 @@ class VectorHit : public RecSegment {
 ///FIXME IMPLEMENT COMPARISON OPERATORS PROPERLY
 inline bool operator<( const VectorHit& one, const VectorHit& other) {
 
-  ///FIXME FIXME FIXME! DUMMY CHECK
-  if ( 1 ) {
+  // right now the comparison is done with the chi2
+  if ( one.chi2() < other.chi2() ) {
     return true;
   }
 
   return false;
 }
 
-std::ostream& operator<<(std::ostream& os, const VectorHit& seg);
+std::ostream& operator<<(std::ostream& os, const VectorHit& vh);
 
 typedef edm::DetSetVector<VectorHit> VectorHitCollection;
 typedef edmNew::DetSetVector<VectorHit> VectorHitCollectionNew;
