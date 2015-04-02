@@ -30,8 +30,15 @@
   <class name="edm::RefVector<edm::OwnVector<TrackingRecHit,edm::ClonePolicy<TrackingRecHit> >,TrackingRecHit,edm::refhelper::FindUsingAdvance<edm::OwnVector<TrackingRecHit,edm::ClonePolicy<TrackingRecHit> >,TrackingRecHit> >"/>
   <class name="edm::Wrapper<edm::OwnVector<TrackingRecHit, edm::ClonePolicy<TrackingRecHit> > >"/>
   <class name="std::vector<VectorHit>"/>
+
   <class name="edm::DetSetVector<VectorHit> "/>
+  <class name="edm::Wrapper<edm::DetSetVector<VectorHit> >"/>
+
+
   <class name="edmNew::DetSetVector<VectorHit> "/>
+  <class name="edm::Wrapper<edmNew::DetSetVector<VectorHit> >"/>
+
+
 </selection>
 <exclusion>
   <class name="edm::OwnVector<TrackingRecHit, edm::ClonePolicy<TrackingRecHit> >">

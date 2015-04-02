@@ -27,7 +27,10 @@ namespace {
     edm::Wrapper<TrackingRecHitCollection> w1;
     
     std::vector<VectorHit> vh1;
-    VectorHitCollection wh1;
-    VectorHitCollectionNew wh1_new;    
+    VectorHitCollection vhc1;
+    VectorHitCollectionNew vhc1_new;    
+    edm::Wrapper<VectorHitCollection> wvhc1;
+    edm::Wrapper<VectorHitCollectionNew> wvhc1_new;
+
   };
 }
