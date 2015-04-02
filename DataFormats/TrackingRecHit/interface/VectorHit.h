@@ -25,8 +25,9 @@
 class VectorHit : public RecSegment {
  public:
 
-  /// Empty constructor 
   VectorHit() : thePosition(), theDirection(), theCovMatrix(), theDimension(0) { std::cout << "qui ci faccio un bel Vector Hit!!" << std::endl;}
+  VectorHit(const LocalPoint& posInner, const LocalVector& dir) ;
+
   ~VectorHit() ;
   virtual VectorHit* clone() const { return new VectorHit(*this);}
 
@@ -148,7 +149,7 @@ class VectorHit : public RecSegment {
 
 };
 
-std::ostream& operator<<(std::ostream& os, const VectorHit& seg);
+std::ostream& operator<<(std::ostream& os, const VectorHit& vh);
 //typedef edm::DetSetVector<VectorHit> VectorHitCollection;
 //typedef edmNew::DetSetVector<VectorHit> VectorHitCollectionNew;
 

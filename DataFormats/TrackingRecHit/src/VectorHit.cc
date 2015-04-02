@@ -6,13 +6,19 @@
  * \author Riccardo Bellan - INFN TO <riccardo.bellan@cern.ch>
  */
 
-/* This Class Header */
 #include "DataFormats/TrackingRecHit/interface/VectorHit.h"
-
-/* Collaborating Class Header */
-//#include "DataFormats/MuonDetId/interface/DTChamberId.h"
 //#include "FWCore/Utilities/interface/Exception.h"
-/* C++ Headers */
+
+VectorHit::VectorHit(const LocalPoint& posInner,
+                     const LocalVector& dir):
+  theCovMatrix(),
+  theDimension(4)
+{
+  thePosition=LocalPoint(posInner);
+  theDirection=LocalVector(dir);
+  std::cout << "New vector hit!" << std::endl;
+  
+}
 
 
 /*
@@ -252,11 +258,11 @@ void VectorHit::setCovMatrixForZed(const LocalPoint& posZInCh){
   // cout << " = " << theCovMatrix[3][3] << endl;
 }
 */
-std::ostream& operator<<(std::ostream& os, const VectorHit& seg) {
-  os << "Pos " << seg.localPosition() << 
-    " Dir: " << seg.localDirection() <<
-    " dim: " << seg.dimension() <<
-    " chi2/ndof: " << seg.chi2() << "/" << seg.degreesOfFreedom() << " :";
+std::ostream& operator<<(std::ostream& os, const VectorHit& vh) {
+  os << "Pos " << vh.localPosition() << 
+    " Dir: " << vh.localDirection() <<
+    " dim: " << vh.dimension() <<
+    " chi2/ndof: " << vh.chi2() << "/" << vh.degreesOfFreedom() << " :";
 /*
   if (seg.hasPhi()) os << seg.phiSegment()->recHits().size();
   else os << 0;

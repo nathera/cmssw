@@ -184,7 +184,9 @@ std::vector<VectorHit> VectorHitBuilder::buildVectorHits(StackGeomDet stack, std
   for( innerClus_iter = innerClus.begin(); innerClus_iter != innerClus.end(); innerClus_iter++ ){
   
     MeasurementPoint mpCluInn(innerClus_iter->center(), innerClus_iter->column() + 0.5);
-    Local3DPoint localPosCluInn = gDUnitInn->topology().localPosition(mpCluInn);
+    Local3DPoint localPosCluInn   = gDUnitInn->topology().localPosition(mpCluInn);
+    //FIXME::ERICA non funziona.
+    //LocalError localPosCluInnErr  = gDUnitInn->topology().localError(mpCluInn);
     Global3DPoint globalPosCluInn = gDUnitInn->surface().toGlobal(localPosCluInn);
 
     std::vector<Phase2TrackerCluster1D>::const_iterator outerClus_iter;
@@ -193,18 +195,25 @@ std::vector<VectorHit> VectorHitBuilder::buildVectorHits(StackGeomDet stack, std
       MeasurementPoint mpCluOut(outerClus_iter->center(), outerClus_iter->column() + 0.5);
       Local3DPoint localPosCluOut = gDUnitOut->topology().localPosition(mpCluOut);
       Global3DPoint globalPosCluOut = gDUnitOut->surface().toGlobal(localPosCluOut);
-
+      Local3DPoint localPosCluOutINN = gDUnitInn->surface().toLocal(globalPosCluOut);
       
       Global3DVector globalVec = globalPosCluOut - globalPosCluInn;
       Local3DVector localVec = localPosCluOut - localPosCluInn;
+      //in the inner reference of frame
+      Local3DVector localVecINN = localPosCluOutINN - localPosCluInn;
+
 
       std::cout << "\t inner global pos " << globalPosCluInn << std::endl;
       std::cout << "\t outer global pos " << globalPosCluOut << std::endl;
       std::cout << "\t global vec " << globalVec << std::endl;
 
-      std::cout << "\t inner local pos " << localPosCluInn << std::endl;
+      std::cout << "\t inner local pos " << localPosCluInn;// << " with error: " << localPosCluInnErr << std::endl;
       std::cout << "\t outer local pos " << localPosCluOut << std::endl;
+      std::cout << "\t outer local pos in the inner sof " << localPosCluOutINN << std::endl;
       std::cout << "\t local vec " << localVec << std::endl;
+      std::cout << "\t local vec in the inner sof " << localVecINN << std::endl;
+
+      VectorHit vh = VectorHit(localPosCluInn, localVecINN);
     }
 
   }
