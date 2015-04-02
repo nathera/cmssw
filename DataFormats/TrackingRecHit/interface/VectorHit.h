@@ -12,8 +12,8 @@
 
 #include "DataFormats/TrackingRecHit/interface/RecSegment.h"
 
-//#include "DataFormats/Common/interface/DetSetVector.h"
-//#include "DataFormats/Common/interface/DetSetVectorNew.h"
+#include "DataFormats/Common/interface/DetSetVector.h"
+#include "DataFormats/Common/interface/DetSetVectorNew.h"
 
 /* Collaborating Class Declarations */
 //#include "DataFormats/DTRecHit/interface/DTSLRecSegment2D.h"
@@ -149,9 +149,21 @@ class VectorHit : public RecSegment {
 
 };
 
+///FIXME IMPLEMENT COMPARISON OPERATORS PROPERLY
+inline bool operator<( const VectorHit& one, const VectorHit& other) {
+
+  ///FIXME FIXME FIXME! DUMMY CHECK
+  if ( 1 ) {
+    return true;
+  }
+
+  return false;
+}
+
 std::ostream& operator<<(std::ostream& os, const VectorHit& vh);
-//typedef edm::DetSetVector<VectorHit> VectorHitCollection;
-//typedef edmNew::DetSetVector<VectorHit> VectorHitCollectionNew;
+
+typedef edm::DetSetVector<VectorHit> VectorHitCollection;
+typedef edmNew::DetSetVector<VectorHit> VectorHitCollectionNew;
 
 #endif // TrackingRecHit_VectorHit_h
 
